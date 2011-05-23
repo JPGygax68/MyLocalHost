@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <style type="text/css">
+
+      table#layout {
+        width: 100%;
+      }
+
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+      }
+
+      div.container {
+        width: 100%;
+        height: 100%;
+      }
+
+      p.error {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        background-color: #f55;
+      }
+
+      table.directory {
+        border-collapse: collapse;
+        border: solid 2px;
+      }
+
+      table.directory tr:hover {
+        background-color: #fa3;
+      }
+
+      table.directory td {
+        padding: 0.25em;
+        border: solid 1px;
+      }
+
+      table.directory th {
+        padding: 0.25em;
+        border: solid 1px;
+        background-color: yellow;
+      }
+
+      table.directory th.name {
+        text-align: left;
+      }
+
+      table.directory td.name {
+        min-width: 10em;
+      }
+
+      table.directory td.size {
+        text-align: right;
+        min-width: 6em;
+      }
+
+      td#center {
+        background-color: yellow;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+
+      function get_appropriate_ws_url()
+      {
+        var pcol;
+        var u = document.URL;
+
+        /*
+         * We open the websocket encrypted if this page came on an
+         * https:// url itself, otherwise unencrypted
+         */
+
+        if (u.substring(0, 5) == "https") {
+          pcol = "wss://";
+          u = u.substr(8);
+        } else {
+          pcol = "ws://";
+          if (u.substring(0, 4) == "http")
+            u = u.substr(7);
+        }
+
+        u = u.split('/');
+
+        return pcol + u[0];
+      }
+
+      function read_directory( path )
+      {
+        var url = get_appropriate_ws_url();
+        console.log( url );
+
+        var websock = new WebSocket( url, "file-access-protocol" );
+
+        try {
+          websock.onopen = function() {
+            console.log( "websocket connection opened" );
+          }
+
+          websock.onmessage = function got_packet(msg) {
+            console.log( "got packet: " + msg.data );
+            //document.getElementById("content_div").textContent = msg.data;
+          }
+
+          websock.onclose = function(){
+            console.log( "websocket connection CLOSED" );
+          }
+
+        } catch(exception) {
+          alert('<p>Error' + exception + '</p>');
+        }
+      }
+
+      function init()
+      {
+        console.log("hi");
+        read_directory( '/' );
+      }
+
+    </script>
+
+  </head>
+  <body onload="init()">
+    <div class="container">
+      <h1 align="center">Local Proxy test page</h1>
+      <table id="layout">
+        <tr>
+          <td id="left"></td>
+          <td id="center">
+            <div id="content_div"></div>
+          </td>
+          <td id="right"></td>
+        </tr>
+      </div>
+    </div>
+  </body>
+</html>

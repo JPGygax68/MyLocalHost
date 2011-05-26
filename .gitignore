@@ -2,6 +2,7 @@
 *.sdf
 *.suo
 *.vcxproj.user
-*/Debug/
-*/Release/
+*/Debug*/
+*/Release*/
 */ipch/
+/output/

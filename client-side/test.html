@@ -8,6 +8,11 @@
         width: 100%;
       }
 
+      table#layout td#center {
+        position: relative;
+        width: 33%;
+      }
+      
       body {
         width: 100%;
         height: 100%;
@@ -30,6 +35,8 @@
       table.directory {
         border-collapse: collapse;
         border: solid 2px;
+        width: 10em;
+        background-color: #eee;
       }
 
       table.directory tr:hover {
@@ -61,7 +68,7 @@
       }
 
       td#center {
-        background-color: yellow;
+        /* background-color: yellow; */
       }
 
     </style>
@@ -95,6 +102,7 @@
       function read_directory( path )
       {
         var url = get_appropriate_ws_url();
+        url += path;
         console.log( url );
 
         var websock = new WebSocket( url, "file-access-protocol" );
@@ -106,7 +114,8 @@
 
           websock.onmessage = function got_packet(msg) {
             console.log( "got packet: " + msg.data );
-            //document.getElementById("content_div").textContent = msg.data;
+            var data = JSON.parse( msg.data );
+            document.getElementById("output").innerHTML += "<tr><td>" + data.name + "</td></tr>";
           }
 
           websock.onclose = function(){
@@ -120,8 +129,7 @@
 
       function init()
       {
-        console.log("hi");
-        read_directory( '/' );
+        read_directory( '/c/' );
       }
 
     </script>
@@ -134,7 +142,8 @@
         <tr>
           <td id="left"></td>
           <td id="center">
-            <div id="content_div"></div>
+            <table id="output" class="directory">
+            </table>
           </td>
           <td id="right"></td>
         </tr>

@@ -129,6 +129,11 @@
       <Project>{332bf17e-fd30-4363-975a-aa731a827b4f}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\client-side\test.html">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

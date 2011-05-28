@@ -1,6 +1,10 @@
 #ifndef __CB_FILEACCESS_H
 #define __CB_FILEACCESS_H
 
+struct struct_fileaccess_callback {
+	char path[FILENAME_MAX];
+};
+
 int
 callback_file_access( 
 	struct libwebsocket_context * context,

@@ -172,7 +172,7 @@ static struct libwebsocket_protocols protocols[] = {
 	{
 		"file-access-protocol",
 		callback_file_access,
-		16 //sizeof(struct per_session_data__lws_mirror)
+		sizeof(struct struct_fileaccess_callback)
 	},
 	{
 		NULL, NULL, 0		/* End of list */

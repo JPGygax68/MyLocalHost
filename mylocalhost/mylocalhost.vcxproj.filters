@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{68da3150-160e-4955-9cb8-f04140b55e04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cb_fileaccess.c">
@@ -47,5 +50,10 @@
     <ClInclude Include="..\src\urlencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\client-side\test.html">
+      <Filter>client</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -96,8 +96,10 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 	wchar_t lastchar;
 	WIN32_FIND_DATAW f;
 	HANDLE h;
-	char buffer[1024];
+	char buffer[LWS_SEND_BUFFER_PRE_PADDING+1024+LWS_SEND_BUFFER_POST_PADDING], *bp;
 	unsigned n;
+
+	bp = buffer + LWS_SEND_BUFFER_PRE_PADDING;
 
 	wcscpy_s( filter, FILENAME_MAX, path );
 	plen = wcsnlen(path, FILENAME_MAX);
@@ -119,17 +121,17 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 		}
 		*/
 		do {
-			char filename[FILENAME_MAX + 128];
+			char filename[FILENAME_MAX];
 			// Convert filename to UTF-8
-			WideCharToMultiByte( CP_UTF8, 0, f.cFileName, -1, buffer, FILENAME_MAX, NULL, NULL );
+			WideCharToMultiByte( CP_UTF8, 0, f.cFileName, -1, filename, FILENAME_MAX, NULL, NULL );
 			// Now assemble an JSON line full of info
-			n = sprintf_s( buffer, sizeof(buffer), "{ \"name\": \"%s\", \"size\": \"%llu\", \"isDirectory\": %s }", 
+			n = sprintf_s( bp, 1024, "{ \"name\": \"%s\", \"size\": \"%llu\", \"isDirectory\": %s }", 
 				filename, 				
 				((unsigned long long) ULONG_MAX + 1) * f.nFileSizeHigh + f.nFileSizeLow,
 				(f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 ? "true" : "false" );
 			assert( n > 0 );
 			// Send that line
-			(void) libwebsocket_write(wsi, (unsigned char*) buffer, n, LWS_WRITE_TEXT);
+			(void) libwebsocket_write(wsi, (unsigned char*) bp, n, LWS_WRITE_TEXT);
 			i ++;
 		} while( FindNextFileW(h, &f) );
 		FindClose(h);
@@ -138,10 +140,10 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 	{
 		char errbuf[1024];
 		w32_get_error_string( errbuf, 1024 );
-		n = sprintf_s( buffer, 1024, "HTTP/1.0 404 Could not open local directory: %s\x0d\x0a"
+		n = sprintf_s( bp, 1024, "HTTP/1.0 404 Could not open local directory: %s\x0d\x0a"
 			"Server: libwebsockets\x0d\x0a"
 			"\x0d\x0a", errbuf );
-		(void) libwebsocket_write( wsi, (unsigned char *) buffer, n, LWS_WRITE_HTTP );
+		(void) libwebsocket_write( wsi, (unsigned char *) bp, n, LWS_WRITE_HTTP );
 	}
 }
 
@@ -206,6 +208,9 @@ callback_file_access(
 	case LWS_CALLBACK_ESTABLISHED:
 		//pss->number = 0;
 		fprintf( stderr, "callback_file_access(): ESTABLISHED\n" );
+		scb = user;
+		uri = lws_gettoken( wsi, WSI_TOKEN_GET_URI );
+		strcpy_s( scb->path, sizeof(scb->path), uri );
 		libwebsocket_callback_on_writable( context, wsi );
 		break;
 
@@ -215,10 +220,7 @@ callback_file_access(
 		break;
 
 	case LWS_CALLBACK_SERVER_WRITEABLE:
-		tokens = in;
 		scb = user;
-		uri = tokens[WSI_TOKEN_GET_URI].token;
-		strcpy_s( scb->path, sizeof(scb->path), uri );
 		read_directory( wsi, scb->path );
 		if ( 0 /* TODO */ ) {
 			fprintf(stderr, "EOF reached, closing\n");

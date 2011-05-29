@@ -10,6 +10,7 @@
         background-color: #f55;
       }
 
+      /*
       table.directory {
         border-collapse: collapse;
         border: solid 2px;
@@ -44,7 +45,24 @@
         text-align: right;
         min-width: 6em;
       }
+      */
 
+      div#container {
+        text-align: center;
+      }
+      
+      div.directory {
+        background-color: #eee;
+        display: inline-block;
+        text-align: left;
+      }
+      
+      div.directory div.folder {
+        margin: 2px;
+        background-color: #5d2;
+        border: solid 1px #881;
+      }
+      
     </style>
 
     <script type="text/javascript">
@@ -87,16 +105,12 @@
           }
 
           websock.onmessage = function got_packet(msg) {
-            console.log( "got packet: " + msg.data );
             var data = JSON.parse( msg.data );
-            var row = document.createElement("tr");
-            var cell = document.createElement("td");
-            row.appendChild( cell );
+            console.log( "directory = " + data.isDirectory );
             var div = document.createElement("div");
-            cell.appendChild( div );
-            div.className = data.isDirectory ? "directory" : "file";
+            div.className = data.isDirectory ? "folder" : "file";
             div.appendChild( document.createTextNode( data.name ) );
-            document.getElementById("output").appendChild( row );
+            document.getElementById("output").appendChild( div );
           }
 
           websock.onclose = function(){
@@ -118,9 +132,9 @@
   </head>
   <body onload="init()">
     <h1 align="center">Local Proxy test page</h1>
-          <div align="center">
-            <table id="output" class="directory">
-            </table>
-          </div>
+    <div id="container">
+      <div id="output" class="directory">
+      </div>
+    </div>
   </body>
 </html>

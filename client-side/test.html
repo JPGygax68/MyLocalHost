@@ -10,70 +10,42 @@
         background-color: #f55;
       }
 
-      /*
-      table.directory {
-        border-collapse: collapse;
-        border: solid 2px;
-        width: 10em;
-        background-color: #eee;
-      }
-
-      table.directory tr:hover {
-        background-color: #fa3;
-      }
-
-      table.directory td {
-        padding: 0.25em;
-        border: solid 1px;
-      }
-
-      table.directory th {
-        padding: 0.25em;
-        border: solid 1px;
-        background-color: yellow;
-      }
-
-      table.directory th.name {
-        text-align: left;
-      }
-
-      table.directory td.name {
-        min-width: 10em;
-      }
-
-      table.directory td.size {
-        text-align: right;
-        min-width: 6em;
-      }
-      */
-
       div#container {
         text-align: center;
       }
-      
-      div.directory div {
+
+      div.directory * {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
         padding: 0.1em;
         overflow: hidden;
       }
-      
+
       div.directory {
         width: 50%;
-        background-color: #eee;
         display: inline-block;
         text-align: left;
         -webkit-column-count: 3;
       }
-      
+
       div.directory * {
         cursor: pointer;
       }
-      
-      div.directory div.folder {
+
+      div.directory p.folder {
         margin: 2px;
         background-color: #5d2;
         border: solid 1px #881;
       }
-      
+
+      div.directory p.folder:hover {
+        background-color: #77ee33;
+      }
+
+      div.directory p.file {
+        background-color: rgba(0,0,0,0.1);
+      }
+
     </style>
 
     <script type="text/javascript" src="test.js"></script>

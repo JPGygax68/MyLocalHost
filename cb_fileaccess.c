@@ -76,9 +76,8 @@ static int normalized_path_to_windows( const char * normalized, wchar_t * native
 		if ( ! *p ) return 1; // legal: an empty native path means we want the list of drives		
 		if ( !isalpha(*p) ) return 0; // illegal: if there is a name after the root specifier, it must be a drive letter
 		drive = *p ++;
-		if ( ! *p ) return 0; // 
-		if ( *p != '/' ) return 0; // illegal: drive letter must be followed by nothing or a slash
-		p ++;
+		if ( *p && *p != '/' ) return 0; // illegal: drive letter must be followed by nothing or a slash
+		if ( *p ) p ++;
 		*q ++ = (wchar_t) toupper(drive);
 		*q ++ = L':';
 		*q ++ = L'\\';

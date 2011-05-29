@@ -51,10 +51,21 @@
         text-align: center;
       }
       
+      div.directory div {
+        padding: 0.1em;
+        overflow: hidden;
+      }
+      
       div.directory {
+        width: 50%;
         background-color: #eee;
         display: inline-block;
         text-align: left;
+        -webkit-column-count: 3;
+      }
+      
+      div.directory * {
+        cursor: pointer;
       }
       
       div.directory div.folder {
@@ -102,6 +113,7 @@
         try {
           websock.onopen = function() {
             console.log( "websocket connection opened" );
+            document.getElementById("output").innerHTML = '';
           }
 
           websock.onmessage = function got_packet(msg) {
@@ -110,6 +122,14 @@
             var div = document.createElement("div");
             div.className = data.isDirectory ? "folder" : "file";
             div.appendChild( document.createTextNode( data.name ) );
+            // TODO: handle "." and ".." correctly
+            div.path = path + '/' + data.name;
+            if ( data.isDirectory ) 
+            {
+              div.addEventListener( 'click', function() {
+                read_directory( this.path );
+              }, false );
+            }
             document.getElementById("output").appendChild( div );
           }
 

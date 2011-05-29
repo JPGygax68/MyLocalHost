@@ -6,6 +6,8 @@
 
 #include "cb_fileaccess.h"
 
+#define BUFFER_SIZE 2048
+
 #ifdef WIN32
 
 // TODO: w32_ necessary ?
@@ -96,7 +98,7 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 	wchar_t lastchar;
 	WIN32_FIND_DATAW f;
 	HANDLE h;
-	char buffer[LWS_SEND_BUFFER_PRE_PADDING+1024+LWS_SEND_BUFFER_POST_PADDING], *bp;
+	char buffer[LWS_SEND_BUFFER_PRE_PADDING+BUFFER_SIZE+LWS_SEND_BUFFER_POST_PADDING], *bp;
 	unsigned n;
 
 	bp = buffer + LWS_SEND_BUFFER_PRE_PADDING;
@@ -112,20 +114,20 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 	{
 		unsigned i;
 		i = 0;
-		/*
 		if ( isalpha(path[0]) && plen >= 2 && plen <= 3 && path[1] == ':' )
 		{
-			mg_printf( conn, "{ \"name\": \".\", \"size\": \"0\", \"isDirectory\": true }\n" );
-			mg_printf( conn, ", { \"name\": \"..\", \"size\": \"0\", \"isDirectory\": true }\n" );
+			n = sprintf_s( bp, BUFFER_SIZE, "{ \"name\": \".\", \"size\": \"0\", \"isDirectory\": true }" );
+			(void) libwebsocket_write(wsi, (unsigned char*) bp, n, LWS_WRITE_TEXT);
+			n = sprintf_s( bp, BUFFER_SIZE, "{ \"name\": \"..\", \"size\": \"0\", \"isDirectory\": true }" );
+			(void) libwebsocket_write(wsi, (unsigned char*) bp, n, LWS_WRITE_TEXT);
 			i = 2;
 		}
-		*/
 		do {
 			char filename[FILENAME_MAX];
 			// Convert filename to UTF-8
 			WideCharToMultiByte( CP_UTF8, 0, f.cFileName, -1, filename, FILENAME_MAX, NULL, NULL );
 			// Now assemble an JSON line full of info
-			n = sprintf_s( bp, 1024, "{ \"name\": \"%s\", \"size\": \"%llu\", \"isDirectory\": %s }", 
+			n = sprintf_s( bp, BUFFER_SIZE, "{ \"name\": \"%s\", \"size\": \"%llu\", \"isDirectory\": %s }", 
 				filename, 				
 				((unsigned long long) ULONG_MAX + 1) * f.nFileSizeHigh + f.nFileSizeLow,
 				(f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 ? "true" : "false" );
@@ -140,7 +142,7 @@ static void read_folder_directory( struct libwebsocket *wsi, const wchar_t * pat
 	{
 		char errbuf[1024];
 		w32_get_error_string( errbuf, 1024 );
-		n = sprintf_s( bp, 1024, "HTTP/1.0 404 Could not open local directory: %s\x0d\x0a"
+		n = sprintf_s( bp, BUFFER_SIZE, "HTTP/1.0 404 Could not open local directory: %s\x0d\x0a"
 			"Server: libwebsockets\x0d\x0a"
 			"\x0d\x0a", errbuf );
 		(void) libwebsocket_write( wsi, (unsigned char *) bp, n, LWS_WRITE_HTTP );
@@ -188,7 +190,6 @@ callback_file_access(
 	)
 {
 	const char * uri;
-	struct lws_tokens *tokens;
 	struct struct_fileaccess_callback *scb;
 
 	switch (reason) {

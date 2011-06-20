@@ -1,3 +1,6 @@
+*.orig
+*.bak
+*~
 *.opensdf
 *.sdf
 *.suo

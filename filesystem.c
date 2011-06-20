@@ -56,4 +56,8 @@ size_t normalized_path_to_native( const char * normalized, char * native, size_t
 }
 
 
+#else // _WIN32
+
+// TODO
+
 #endif // _WIN32

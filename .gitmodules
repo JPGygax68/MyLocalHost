@@ -1,3 +1,6 @@
 [submodule "third-party/libwebsockets"]
 	path = third-party/libwebsockets
 	url = git://git.warmcat.com/libwebsockets
+[submodule "third-party/websockify"]
+	path = third-party/websockify
+	url = https://JPGygax68@github.com/JPGygax68/websockify.git

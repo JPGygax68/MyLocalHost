@@ -68,7 +68,7 @@ static void my_connection_handler(ws_ctx_t *ctx, ws_listener_t *settings)
 }
 #endif
 
-static void request_handler(wsv_ctx_t *ctx, wsv_settings_t *settings)
+static void request_handler(wsv_ctx_t *ctx, const char *header, wsv_settings_t *settings)
 {
     // TODO
 }
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     strcpy(settings.listen_host, "localhost");
     settings.listen_port = 7681; // TODO: symbolic constant
     settings.ssl_only = 0;
-    settings.handler = request_handler;
+    settings.handler = NULL; // use the default handler
     settings.userdata = NULL;
     
 	while (n >= 0) {
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 	//if (!use_ssl)
 	//	cert_path = key_path = NULL;
 
-	wsv_start_server(&settings, request_handler);
+	wsv_start_server(&settings);
 
     return 0;
 }

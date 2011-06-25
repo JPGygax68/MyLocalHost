@@ -1,9 +1,8 @@
 /*
  * mylocalhost
  *
- * Copyright (C) 20111 Jean-Pierre Gygax <gygax@practicomp.ch>
+ * Copyright (C) 2011 Jean-Pierre Gygax <gygax@practicomp.ch>
  *
- * Adapted from Andy "Warmcat" Greene's libwebsockets test server.
  */
 
 #include <stdio.h>
@@ -13,41 +12,12 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <webserver/webserver.h>
 #include <websocket/websocket.h>
 
-#include "urlencode.h"
-#include "filesystem.h"
-#include "cb_fileaccess.h"
-
-static int serve_http(ws_ctx_t *ctx, const char *uri)
-{
-	char client_name[128];
-	char client_ip[128];
-	char normpath[FILENAME_MAX];
-	size_t nplen;
-	char nativepath[FILENAME_MAX];
-	size_t ntplen;
-
-    fprintf(stderr, "serving HTTP URI %s\n", uri);
-
-    if (strcmp(in, "favicon.ico") == 0) {
-        if (ws_serve_http_file(wsi, "favicon.ico", "image/x-icon"))
-            fprintf(stderr, "Failed to send favicon\n");
-    }
-
-    // Decode the (normalized) path (ignoring URL parameters for now)
-    nplen = url_decode((const char*)in + 1, -1, normpath, FILENAME_MAX, 0);
-
-    // Now convert the path to native
-    ntplen = normalized_path_to_native( normpath, nativepath, FILENAME_MAX );
-
-    /* Send the file  */
-    // TODO: check for existence, send 404 if not found
-    if ( ws_serve_http_file(wsi, nativepath, "text/html") )
-        fprintf(stderr, "Failed to send HTTP file\n");
-
-	return 0;
-}
+//#include "urlencode.h"
+//#include "filesystem.h"
+//#include "cb_fileaccess.h"
 
 static struct option options[] = {
 	{ "help",	no_argument,		NULL, 'h' },
@@ -59,24 +29,71 @@ static struct option options[] = {
 	{ NULL, 0, 0, 0 }
 };
 
+#ifdef NOT_DEFINED
+static void my_connection_handler(ws_ctx_t *ctx, ws_listener_t *settings)
+{
+    int tsock = 0;
+    struct sockaddr_in taddr;
+    const char *uri;
+    
+    // Extract target host and port from URI
+    uri = ws_get_location(ctx);
+    
+    // Connect to target socket
+    fprintf(stderr, "connecting to: %s:%d, location=\"%s\"", target->host, target->port, ws_get_location(ctx));
+    tsock = socket(AF_INET, SOCK_STREAM, 0);
+    if (tsock < 0) {
+        LOG_ERR("Could not create target socket: %s", strerror(errno));
+        return;
+    }
+    memset((char *) &taddr, 0, sizeof(taddr));
+    taddr.sin_family = AF_INET;
+    taddr.sin_port = htons(target->port);
+    
+    /* Resolve target address */
+    if (ws_resolve_host(&taddr.sin_addr, target->host) < -1) {
+        LOG_ERR("Could not resolve target address: %s\n", strerror(errno));
+    }
+    
+    if (connect(tsock, (struct sockaddr *) &taddr, sizeof(taddr)) < 0) {
+        LOG_ERR("Could not connect to target: %s\n", strerror(errno));
+        close(tsock);
+        return;
+    }
+    
+    wsp_do_proxy(ctx, tsock);
+    
+    closesocket(tsock);
+    
+}
+#endif
+
+static void request_handler(wsv_ctx_t *ctx, wsv_settings_t *settings)
+{
+    // TODO
+}
+
 int main(int argc, char **argv)
 {
     int n = 0;
     //const char *cert_path = "mylocalhost.pem";
     //const char *key_path = "mylocalhost.key.pem";
     //int use_ssl = 0;
-    ws_listener_t listener;
+    //ws_listener_t listener;
+    //wsp_target_t target;
+    wsv_settings_t settings;
     int opts = 0;
 
 	fprintf(stderr, "MyLocalHost server\n"
 			"(C) Copyright 2011 Jean-Pierre Gygax <gygax@practicomp.ch>\n" );
 
-    listener.certfile = NULL;
-    listener.keyfile = NULL;
-    listener.listen_host = "localhost";
-    listener.listen_port = 7681; // TODO: symbolic constant
-    listener.ssl_only = 0;
-    listener.userdata = NULL;
+    settings.certfile = NULL;
+    settings.keyfile = NULL;
+    strcpy(settings.listen_host, "localhost");
+    settings.listen_port = 7681; // TODO: symbolic constant
+    settings.ssl_only = 0;
+    settings.handler = request_handler;
+    settings.userdata = NULL;
     
 	while (n >= 0) {
 		n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
@@ -90,7 +107,7 @@ int main(int argc, char **argv)
 			opts = LWS_SERVER_OPTION_DEFEAT_CLIENT_MASK;
 			break; */
 		case 'p':
-			port = atoi(optarg);
+			settings.listen_port = atoi(optarg);
 			break;
 		/* case 'i':
 			strncpy(interface_name, optarg, sizeof interface_name);
@@ -107,7 +124,7 @@ int main(int argc, char **argv)
 	//if (!use_ssl)
 	//	cert_path = key_path = NULL;
 
-	ws_start_server(listener);
+	wsv_start_server(&settings, request_handler);
 
     return 0;
 }

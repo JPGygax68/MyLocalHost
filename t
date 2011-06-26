@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# Test!
+#
+
+./mylocalhost

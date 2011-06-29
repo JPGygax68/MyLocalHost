@@ -19,5 +19,5 @@ cd ..
 cd ..
 cd ..
 
-make >/dev/null
+make -B >/dev/null
 

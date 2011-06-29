@@ -10,14 +10,12 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/time.h>
 
 #include <webserver/webserver.h>
 #include <websocket/websocket.h>
-
-//#include "urlencode.h"
-//#include "filesystem.h"
-//#include "cb_fileaccess.h"
+#include <wsproxy/wsproxy.h>
 
 static struct option options[] = {
 	{ "help",	no_argument,		NULL, 'h' },
@@ -29,48 +27,49 @@ static struct option options[] = {
 	{ NULL, 0, 0, 0 }
 };
 
-#ifdef NOT_DEFINED
-static void my_connection_handler(ws_ctx_t *ctx, ws_listener_t *settings)
+static int my_connection_handler(wsv_ctx_t *wsvctx, const char *header, void *userdata)
 {
+    wsk_ctx_t *ctx;
     int tsock = 0;
     struct sockaddr_in taddr;
     const char *uri;
+
+    fprintf(stderr, "%s\n", __FUNCTION__); // TODO: real logging
     
-    // Extract target host and port from URI
-    uri = ws_get_location(ctx);
+    // Upgrade the connection
+    ctx = wsk_handshake(wsvctx, 0); // TODO: handle SSL
+    if (!ctx) {
+        fprintf(stderr, "Failed to upgrade the connection\n");
+        return -1;
+    }
     
-    // Connect to target socket
-    fprintf(stderr, "connecting to: %s:%d, location=\"%s\"", target->host, target->port, ws_get_location(ctx));
+    // Resolve target host and port
+    memset((char *) &taddr, 0, sizeof(taddr));
+    //taddr.sin_family = AF_INET;
+    if (wsv_resolve_host(&taddr.sin_addr, uri) < -1) {
+        fprintf(stderr, "Could not resolve target address \"%s\"\n", uri);
+        return -1;
+    }
+    
+    // Create and connect to target socket
     tsock = socket(AF_INET, SOCK_STREAM, 0);
     if (tsock < 0) {
-        LOG_ERR("Could not create target socket: %s", strerror(errno));
-        return;
-    }
-    memset((char *) &taddr, 0, sizeof(taddr));
-    taddr.sin_family = AF_INET;
-    taddr.sin_port = htons(target->port);
-    
-    /* Resolve target address */
-    if (ws_resolve_host(&taddr.sin_addr, target->host) < -1) {
-        LOG_ERR("Could not resolve target address: %s\n", strerror(errno));
-    }
-    
+        fprintf(stderr, "Could not create target socket: %s", strerror(errno));
+        return -1;
+    }    
     if (connect(tsock, (struct sockaddr *) &taddr, sizeof(taddr)) < 0) {
-        LOG_ERR("Could not connect to target: %s\n", strerror(errno));
+        fprintf(stderr, "Could not connect to target: %s\n", strerror(errno));
         close(tsock);
-        return;
+        return -1;
     }
+    
+    printf("about to call wsp_do_proxy()\n");
     
     wsp_do_proxy(ctx, tsock);
     
-    closesocket(tsock);
+    // TODO: free the context
     
-}
-#endif
-
-static void request_handler(wsv_ctx_t *ctx, const char *header, wsv_settings_t *settings)
-{
-    // TODO
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -87,13 +86,17 @@ int main(int argc, char **argv)
 	fprintf(stderr, "MyLocalHost server\n"
 			"(C) Copyright 2011 Jean-Pierre Gygax <gygax@practicomp.ch>\n" );
 
+    //memset(&settings, sizeof(settings), 0);
     settings.certfile = NULL;
     settings.keyfile = NULL;
     strcpy(settings.listen_host, "localhost");
     settings.listen_port = 7681; // TODO: symbolic constant
     settings.ssl_only = 0;
     settings.handler = NULL; // use the default handler
+    settings.protocols = NULL;
     settings.userdata = NULL;
+    
+    wsv_register_protocol(&settings, "WebSocket", my_connection_handler);
     
 	while (n >= 0) {
 		n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
@@ -124,7 +127,7 @@ int main(int argc, char **argv)
 	//if (!use_ssl)
 	//	cert_path = key_path = NULL;
 
-	wsv_start_server(&settings);
+    wsv_start_server(&settings);
 
     return 0;
 }

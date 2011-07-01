@@ -27,12 +27,12 @@ static struct option options[] = {
 	{ NULL, 0, 0, 0 }
 };
 
-static int my_connection_handler(wsv_ctx_t *wsvctx, const char *header, void *userdata)
+static int my_connection_handler(wsv_ctx_t *wsvctx, char *header, void *userdata)
 {
     wsk_ctx_t *ctx;
     int tsock = 0;
     struct sockaddr_in taddr;
-    const char *uri;
+    char uri[512];
 
     fprintf(stderr, "%s\n", __FUNCTION__); // TODO: real logging
     
@@ -46,7 +46,7 @@ static int my_connection_handler(wsv_ctx_t *wsvctx, const char *header, void *us
     // Resolve target host and port
     memset((char *) &taddr, 0, sizeof(taddr));
     //taddr.sin_family = AF_INET;
-    if (wsv_resolve_host(&taddr.sin_addr, uri) < -1) {
+    if (wsv_resolve_host(&taddr.sin_addr, wsv_extract_url(header, uri)) < -1) {
         fprintf(stderr, "Could not resolve target address \"%s\"\n", uri);
         return -1;
     }
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     settings.keyfile = NULL;
     strcpy(settings.listen_host, "localhost");
     settings.listen_port = 7681; // TODO: symbolic constant
-    settings.ssl_only = 0;
+    settings.ssl_policy = wsv_allow_ssl;
     settings.handler = NULL; // use the default handler
     settings.protocols = NULL;
     settings.userdata = NULL;

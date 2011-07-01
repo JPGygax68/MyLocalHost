@@ -12,3 +12,5 @@
 *.o
 mylocalhost
 *.kdev4
+.kdev_include_paths
+

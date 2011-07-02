@@ -42,6 +42,11 @@ static int my_connection_handler(wsv_ctx_t *wsvctx, char *header, void *userdata
         fprintf(stderr, "Failed to upgrade the connection\n");
         return -1;
     }
+    printf("Upgraded the connection successfully\n");
+
+    // Look at the URI
+    wsv_extract_url(header, uri);
+    printf("URI=\"%s\"\n", uri);
     
     // Resolve target host and port
     memset((char *) &taddr, 0, sizeof(taddr));
@@ -62,10 +67,6 @@ static int my_connection_handler(wsv_ctx_t *wsvctx, char *header, void *userdata
         close(tsock);
         return -1;
     }
-    
-    printf("about to call wsp_do_proxy()\n");
-    
-    wsp_do_proxy(ctx, tsock);
     
     // TODO: free the context
     

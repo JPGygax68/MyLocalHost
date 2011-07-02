@@ -76,78 +76,7 @@
       
     </style>
 
-    <script type="text/javascript">
-
-      function get_appropriate_ws_url()
-      {
-        var pcol;
-        var u = document.URL;
-
-        /*
-         * We open the websocket encrypted if this page came on an
-         * https:// url itself, otherwise unencrypted
-         */
-
-        if (u.substring(0, 5) == "https") {
-          pcol = "wss://";
-          u = u.substr(8);
-        } else {
-          pcol = "ws://";
-          if (u.substring(0, 4) == "http")
-            u = u.substr(7);
-        }
-
-        u = u.split('/');
-
-        return pcol + u[0];
-      }
-
-      function read_directory( path )
-      {
-        var url = get_appropriate_ws_url();
-        url += path;
-        console.log( url );
-
-        var websock = new WebSocket( url, "file-access-protocol" );
-
-        try {
-          websock.onopen = function() {
-            console.log( "websocket connection opened" );
-            document.getElementById("output").innerHTML = '';
-          }
-
-          websock.onmessage = function got_packet(msg) {
-            var data = JSON.parse( msg.data );
-            console.log( "directory = " + data.isDirectory );
-            var div = document.createElement("div");
-            div.className = data.isDirectory ? "folder" : "file";
-            div.appendChild( document.createTextNode( data.name ) );
-            // TODO: handle "." and ".." correctly
-            div.path = path + '/' + data.name;
-            if ( data.isDirectory ) 
-            {
-              div.addEventListener( 'click', function() {
-                read_directory( this.path );
-              }, false );
-            }
-            document.getElementById("output").appendChild( div );
-          }
-
-          websock.onclose = function(){
-            console.log( "websocket connection CLOSED" );
-          }
-
-        } catch(exception) {
-          alert('<p>Error' + exception + '</p>');
-        }
-      }
-
-      function init()
-      {
-        read_directory( '/c/' );
-      }
-
-    </script>
+    <script type="text/javascript" src="test.js"></script>
 
   </head>
   <body onload="init()">

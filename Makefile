@@ -9,7 +9,7 @@ SHELL = /bin/bash
 
 WSFSUBDIR = third-party/websockify
 
-CFLAGS += -I $(WSFSUBDIR)
+CFLAGS += -Wall -I $(WSFSUBDIR)
 
 SRC = mylocalhost.c
 

@@ -18,6 +18,8 @@
 #include <websocket/websocket.h>
 #include <wsproxy/wsproxy.h>
 
+#include <dirent.h>
+
 #define __LOG(stream, ...) \
 { \
 fprintf(stream, __VA_ARGS__); \
@@ -37,6 +39,38 @@ static struct option options[] = {
 	{ "closetest",  no_argument,		NULL, 'c' },*/
 	{ NULL, 0, 0, 0 }
 };
+
+static int
+read_directory(wsk_ctx_t *ctx, const char *path)
+{
+    DIR *dir;
+    struct dirent *de;
+    char msg[1024];
+    char encoded[256];
+    int len;
+    int err;
+    
+    err = -1;
+    
+    dir = opendir(path);
+    if (dir == NULL) {
+        len = snprintf(msg, 1024, "{ \"error\": \"Failed to open the directory\" }" );
+        wsk_send(ctx, (wsk_byte_t*) msg, len);
+        goto fail; }
+    
+    while ((de = readdir(dir)) != NULL) {
+        wsv_url_encode(de->d_name, encoded, 256);
+        len = snprintf(msg, 1024, "{ \"name\"=\"%s\", \"isDirectory\"=\"%s\" }", 
+                       encoded, de->d_type == DT_DIR ? "true" : "false" );
+        wsk_send(ctx, (wsk_byte_t*) msg, len);
+    }
+    
+    err = 0;
+    
+fail:
+    if (dir) closedir(dir);
+    return err;
+}
 
 static int 
 localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
@@ -73,6 +107,10 @@ localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
             wsv_url_decode(encoded, p - encoded, q, n, 0);
             LOG_DBG("Parameter %s=\"%s\"", pname, q);
         }
+        // Read the specified directory and send it back
+        if (read_directory(ctx, path) != 0) {
+            LOG_ERR("Error reading directory \"%s\"", path);
+            goto fail; }
     }
     else { LOG_ERR("Unknown command \"%s\"", command); goto fail; }
 
@@ -93,7 +131,7 @@ main(int argc, char **argv)
     //wsp_target_t target;
     wsv_settings_t settings;
     wsk_service_t *wsksvc;
-    int opts = 0;
+    //int opts = 0;
 
 	fprintf(stderr, "MyLocalHost server\n"
 			"(C) Copyright 2011 Jean-Pierre Gygax <gygax@practicomp.ch>\n" );

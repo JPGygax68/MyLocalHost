@@ -27,6 +27,13 @@ static struct option options[] = {
 	{ NULL, 0, 0, 0 }
 };
 
+static int localfs_directory_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
+{
+    printf("%s: location=%s\n", __FUNCTION__, location);
+    
+    return -1;
+}
+
 int 
 main(int argc, char **argv)
 {
@@ -59,6 +66,11 @@ main(int argc, char **argv)
         return -1;
     }
     
+    if (wsk_register_subprotocol(wsksvc, "localfs-directory", localfs_directory_handler, NULL)) {
+        fprintf(stderr, "Failed to register \"localfs-directory\" subprotocol handler\n" );
+        return -1;
+    }
+
 	while (n >= 0) {
 		n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
 		if (n < 0)

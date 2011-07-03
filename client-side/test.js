@@ -45,7 +45,7 @@ function read_directory( folder_path )
     url += '/' + make_directory_command( folder_path );
     console.log( url );
     
-    var websock = new WebSocket( url, "localfs-directory" );
+    var websock = new WebSocket( url, "localfs" );
     
     try {
         websock.onopen = function() {

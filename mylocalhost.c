@@ -12,10 +12,21 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <assert.h>
 
 #include <webserver/webserver.h>
 #include <websocket/websocket.h>
 #include <wsproxy/wsproxy.h>
+
+#define __LOG(stream, ...) \
+{ \
+fprintf(stream, __VA_ARGS__); \
+fprintf(stream, "\n" ); \
+}
+
+#define LOG_MSG(...) __LOG(stdout, __VA_ARGS__);
+#define LOG_ERR(...) __LOG(stderr, __VA_ARGS__);
+#define LOG_DBG LOG_MSG
 
 static struct option options[] = {
 	{ "help",	no_argument,		NULL, 'h' },
@@ -27,10 +38,47 @@ static struct option options[] = {
 	{ NULL, 0, 0, 0 }
 };
 
-static int localfs_directory_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
+static int 
+localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
 {
-    printf("%s: location=%s\n", __FUNCTION__, location);
+    const char *p;
+    size_t n;
+    char command[64], pname[32], encoded[1024], *q;
+    char path[1024];
     
+    printf("%s: location=%s\n", __FUNCTION__, location);
+
+    // Extract command (we ignore the path here)
+    p = strrchr(location, '/'); assert(p);
+    p++; // skip the last slash
+    for (q = command; *p && *p != '?'; p++, q ++) *q = *p; *q = '\0';
+    LOG_DBG("Command: \"%s\"", command);
+    
+    if (strcmp(command, "$directory") == 0) {
+        if (*p != '?') { LOG_ERR("Missing parameter introducer '?'"); goto fail; }
+        p ++; // skip the parameter introducer
+        // Now extract the parameters
+        while (*p) {
+            // Get the parameter name
+            for (q = pname; *p && *p != '=' && *p != '&'; p++, q++) *q = *p; *q = '\0';
+            // Now the parameter value
+            if (*p != '=') { 
+                LOG_ERR("Missing equality sign after parameter name \"%s\"", pname); 
+                goto fail; }                
+            for (p++, q = encoded; *p && *p != '&'; p++, q++) *q = *p; *q = '\0';
+            // Parameter name decides where the decoded value will go
+            if (strcmp(pname, "path") == 0) { q = path, n = sizeof(path); }
+            else { LOG_ERR("Unknown parameter \"%s\"", pname); goto fail; }
+            // Now decode the parameter value
+            wsv_url_decode(encoded, p - encoded, q, n, 0);
+            LOG_DBG("Parameter %s=\"%s\"", pname, q);
+        }
+    }
+    else { LOG_ERR("Unknown command \"%s\"", command); goto fail; }
+
+    return 0;
+    
+fail:
     return -1;
 }
 
@@ -66,8 +114,8 @@ main(int argc, char **argv)
         return -1;
     }
     
-    if (wsk_register_subprotocol(wsksvc, "localfs-directory", localfs_directory_handler, NULL)) {
-        fprintf(stderr, "Failed to register \"localfs-directory\" subprotocol handler\n" );
+    if (wsk_register_subprotocol(wsksvc, "localfs", localfs_handler, NULL)) {
+        fprintf(stderr, "Failed to register \"localfs\" subprotocol handler\n" );
         return -1;
     }
 

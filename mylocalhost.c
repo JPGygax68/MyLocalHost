@@ -146,17 +146,12 @@ main(int argc, char **argv)
     settings.protocols = NULL;
     settings.userdata = NULL;
 
-    wsksvc = wsk_extend_webservice(&settings);
+    wsksvc = wsk_extend_webservice(&settings, localfs_handler, NULL);
     if (!wsksvc) {
         fprintf(stderr, "Failed to extend web service with WebSocket protocol");
         return -1;
     }
     
-    if (wsk_register_subprotocol(wsksvc, "localfs", localfs_handler, NULL)) {
-        fprintf(stderr, "Failed to register \"localfs\" subprotocol handler\n" );
-        return -1;
-    }
-
 	while (n >= 0) {
 		n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
 		if (n < 0)

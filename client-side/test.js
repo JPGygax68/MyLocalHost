@@ -1,4 +1,8 @@
 
+if (window.MozWebSocket) {
+    console.log("Mozilla Web Sockets detected");
+    window.WebSocket = window.MozWebSocket;
+}
 
 /* The "appropriate" base URL is, by definition, one that replaces "http" with 
  * "ws" or "https" with "wss", and removes the last part of the path of the
@@ -83,5 +87,5 @@ function read_directory( folder_path )
 
 function init()
 {
-    read_directory( '/' );
+    window.setTimeout(function() { read_directory( '/' ); }, 500 );
 }

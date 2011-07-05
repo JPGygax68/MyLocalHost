@@ -41,11 +41,13 @@ function make_directory_command( folder_path )
 
 function read_directory( folder_path )
 {
+    console.log("read_directory( \""+folder_path+"\" )");
+    
     var url = get_appropriate_ws_base_url();
     url += '/' + make_directory_command( folder_path );
     console.log( url );
     
-    var websock = new WebSocket(url, "base64");
+    var websock = new WebSocket(url);
     
     try {
         websock.onopen = function() {
@@ -55,12 +57,12 @@ function read_directory( folder_path )
         
         websock.onmessage = function got_packet(msg) {
             var data = JSON.parse( msg.data );
-            console.log( "directory = " + data.isDirectory );
+            //console.log( "directory = " + data.isDirectory );
             var div = document.createElement("div");
             div.className = data.isDirectory ? "folder" : "file";
             div.appendChild( document.createTextNode( data.name ) );
             // TODO: handle "." and ".." correctly
-            div.path = path + '/' + data.name;
+            div.path = folder_path + '/' + data.name;
             if ( data.isDirectory ) 
             {
                 div.addEventListener( 'click', function() {
@@ -70,7 +72,7 @@ function read_directory( folder_path )
             document.getElementById("output").appendChild( div );
         }
         
-        websock.onclose = function(){
+        websock.onclose = function() {
             console.log( "websocket connection CLOSED" );
         }
         
@@ -81,5 +83,5 @@ function read_directory( folder_path )
 
 function init()
 {
-    read_directory( '/c/' );
+    read_directory( '/' );
 }

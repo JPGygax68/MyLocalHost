@@ -136,6 +136,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\third-party\websockify;$(SolutionDir)..\third-party\websockify\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,14 +163,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\filesystem.c" />
     <ClCompile Include="..\mylocalhost.c" />
+    <ClCompile Include="..\third-party\websockify\win32\getopt.c" />
+    <ClCompile Include="..\third-party\websockify\win32\getopt_long.c" />
     <ClCompile Include="..\urlencode.c" />
+    <ClCompile Include="..\win32\localfs_w32.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\cb_fileaccess.h" />
-    <ClInclude Include="..\filesystem.h" />
     <ClInclude Include="..\urlencode.h" />
+    <ClInclude Include="..\win32\localfs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

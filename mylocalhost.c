@@ -12,15 +12,21 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#ifndef _WIN32
-#include <sys/time.h>
-#include <dirent.h>
-#endif
-
 #include <webserver/webserver.h>
 #include <websocket/websocket.h>
 #include <wsproxy/wsproxy.h>
+#include "localfs.h"
 
+/* Windows/Visual Studio quirks */
+
+#pragma warning(disable:4996)
+
+#ifdef _WIN32
+#define close _close
+#define strdup _strdup
+#endif
+
+/* Debugging */
 
 #define __LOG(stream, ...) \
 { \
@@ -41,43 +47,6 @@ static struct option options[] = {
 	{ "closetest",  no_argument,		NULL, 'c' },*/
 	{ NULL, 0, 0, 0 }
 };
-
-static int
-read_directory(wsk_ctx_t *ctx, const char *path)
-{
-    DIR *dir;
-    struct dirent *de;
-    char *msg;
-    char encoded[256];
-    int len;
-    int err;
-
-    err = -1;
-    
-    msg = (char*) wsk_alloc_block(ctx, 1024);
-    if (!msg) goto fail;
-    
-    dir = opendir(path);
-    if (dir == NULL) {
-        len = snprintf(msg, 1024, "{ \"error\": \"Failed to open the directory\" }" );
-        wsk_send(ctx, (wsk_byte_t*) msg, len);
-        LOG_ERR("Failed to open the directory \"%s\"", path);
-        goto fail; }
-    
-    while ((de = readdir(dir)) != NULL) {
-        wsv_url_encode(de->d_name, encoded, 256);
-        len = snprintf(msg, 1024, "{ \"name\": \"%s\", \"isDirectory\": \"%s\" }", 
-                       encoded, de->d_type == DT_DIR ? "true" : "false" );
-        wsk_send(ctx, (wsk_byte_t*) msg, len);
-    }
-    
-    err = 0;
-    
-fail:
-    if (dir) closedir(dir);
-    if (msg) wsk_free_block(ctx, (wsk_byte_t*)msg);
-    return err;
-}
 
 static int 
 localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)

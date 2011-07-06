@@ -23,13 +23,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\filesystem.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\mylocalhost.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\urlencode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\localfs_w32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third-party\websockify\win32\getopt_long.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third-party\websockify\win32\getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -37,10 +43,10 @@
     <ClInclude Include="..\cb_fileaccess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\filesystem.h">
+    <ClInclude Include="..\urlencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\urlencode.h">
+    <ClInclude Include="..\win32\localfs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

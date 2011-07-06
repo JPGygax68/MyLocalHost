@@ -11,14 +11,16 @@
 #include <getopt.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/time.h>
 #include <assert.h>
+#ifndef _WIN32
+#include <sys/time.h>
+#include <dirent.h>
+#endif
 
 #include <webserver/webserver.h>
 #include <websocket/websocket.h>
 #include <wsproxy/wsproxy.h>
 
-#include <dirent.h>
 
 #define __LOG(stream, ...) \
 { \

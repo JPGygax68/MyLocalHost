@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <Windows.h>
+#include <direct.h>
 
 #include "localfs.h"
 
@@ -22,51 +23,6 @@ static void
 w32_get_error_string( char * buffer, size_t len )
 {
 	FormatMessageA( 0, NULL, 0, 0, buffer, len, NULL );
-}
-
-/* We get (or assume we get...) the normalized path as UTF-8 (URL-decoded).
- * RETURNS THE NUMBER OF BYTES, *NOT* UTF-8 CHARACTER SEQUENCES!
- */
-size_t 
-normalized_path_to_native( const char * normalized, char * native, size_t bufsize )
-{
-	size_t nsize;
-	const char * p;
-	char *q;
-	size_t ntsize;
-
-	p = normalized;
-	nsize = strnlen( normalized, FILENAME_MAX );
-	q = native;
-	*q = '\0';
-	ntsize = 0;
-
-	// Absolute path ?
-	if ( normalized[0] == '/' )
-	{
-		char drive;
-		p ++;
-		if ( ! *p ) return 1; // legal: an empty native path means we want the list of drives		
-		if ( !isalpha(*p) ) return 0; // illegal: if there is a name after the root specifier, it must be a drive letter
-		drive = *p ++;
-		if ( ! *p ) return 0; // 
-		if ( *p != '/' ) return 0; // illegal: drive letter must be followed by nothing or a slash
-		p ++;
-		*q ++ = toupper(drive);
-		*q ++ = ':';
-		*q ++ = '\\';
-		ntsize = 3;
-	}
-
-	for ( ; *p; p ++, q++, ntsize ++ ) 
-	{
-		if ( q >= (native+bufsize-1) )
-			return 0;
-		*q = *p;
-	}
-	*q = '\0';
-
-	return ntsize;
 }
 
 /* TODO: in theory, this needs to be implemented in a way that can stretch across several
@@ -108,7 +64,7 @@ read_drive_list(wsk_ctx_t *ctx, wsk_byte_t *buffer)
   The length of the native buffer (number of wide characters) is assumed to be FILENAME_MAX.
  */
 static int 
-normalized_path_to_windows( const char * normalized, wchar_t * native )
+normalized_path_to_windows(const char * normalized, wchar_t *native)
 {
 	size_t nsize;
 	const char * p;
@@ -135,7 +91,7 @@ normalized_path_to_windows( const char * normalized, wchar_t * native )
 	}
 
 	// Now convert the rest to UTF-16
-	(void) MultiByteToWideChar( CP_UTF8, 0, p, -1, q, FILENAME_MAX - (q - native) );
+	(void) MultiByteToWideChar(CP_UTF8, 0, p, -1, q, FILENAME_MAX - (q - native));
 
 	return 1;
 }

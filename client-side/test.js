@@ -66,7 +66,7 @@ function read_directory( folder_path )
             div.className = data.isDirectory ? "folder" : "file";
             div.appendChild( document.createTextNode( data.name ) );
             // TODO: handle "." and ".." correctly
-            div.path = folder_path + '/' + data.name;
+            div.path = folder_path + data.name + (data.isDirectory ? '/' : '');
             if ( data.isDirectory ) 
             {
                 div.addEventListener( 'click', function() {
@@ -87,5 +87,6 @@ function read_directory( folder_path )
 
 function init()
 {
+	console.log("init()");
     window.setTimeout(function() { read_directory( '/' ); }, 500 );
 }

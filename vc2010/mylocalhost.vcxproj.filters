@@ -40,9 +40,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\cb_fileaccess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\urlencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -170,7 +170,6 @@
     <ClCompile Include="..\win32\localfs_w32.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\cb_fileaccess.h" />
     <ClInclude Include="..\urlencode.h" />
     <ClInclude Include="..\win32\localfs.h" />
   </ItemGroup>

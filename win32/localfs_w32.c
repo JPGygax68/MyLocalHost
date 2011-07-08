@@ -19,10 +19,15 @@
 
 /* Private routines */
 
-static void 
+static size_t 
 w32_get_error_string( char * buffer, size_t len )
 {
-	FormatMessageA( 0, NULL, 0, 0, buffer, len, NULL );
+    size_t size;
+    size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)buffer, len, NULL);
+    if (size == 0) {
+        fprintf(stderr, "%s: FormatMessage() failed: %\n", __FUNCTION__, GetLastError());
+    }
+    return size;
 }
 
 /* TODO: in theory, this needs to be implemented in a way that can stretch across several
@@ -47,7 +52,7 @@ read_drive_list(wsk_ctx_t *ctx, wsk_byte_t *buffer)
 			//if ( flag ) mg_write( conn, ",", 1 );
 			n = sprintf((char*)buffer, "{ \"name\": \"%c\", \"size\": 0, \"isDirectory\": true }", letter );
 			// TODO: can this function decide to write less than specified length ?
-			(void) wsk_send(ctx, buffer, n);
+			(void) wsk_sendall(ctx, buffer, n);
 			total += n; 
 			//flag = 1;
 		}
@@ -121,9 +126,9 @@ read_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
 		if ( isalpha(path[0]) && plen >= 2 && plen <= 3 && path[1] == ':' )
 		{
 			n = sprintf((char*)buffer, "{ \"name\": \".\", \"size\": \"0\", \"isDirectory\": true }" );
-			(void) wsk_send(ctx, buffer, n);
+			(void) wsk_sendall(ctx, buffer, n);
 			n = sprintf((char*)buffer, "{ \"name\": \"..\", \"size\": \"0\", \"isDirectory\": true }" );
-			(void) wsk_send(ctx, buffer, n);
+			(void) wsk_sendall(ctx, buffer, n);
 			i = 2;
 		}
 		do {
@@ -136,7 +141,7 @@ read_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
 				(f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 ? "true" : "false" );
 			assert( n > 0 );
 			// Send that line
-			(void) wsk_send(ctx, buffer, n);
+			(void) wsk_sendall(ctx, buffer, n);
 			i ++;
 		} while( FindNextFileW(h, &f) );
 		FindClose(h);
@@ -144,11 +149,13 @@ read_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
 	else
 	{
 		char errbuf[1024];
-		w32_get_error_string( errbuf, 1024 );
+        size_t size;
+		size = w32_get_error_string( errbuf, 1024 );
+        // TODO: error reporting must use special format
 		n = sprintf((char*)buffer, "HTTP/1.0 404 Could not open local directory: %s\x0d\x0a"
 			"Server: libwebsockets\x0d\x0a"
-			"\x0d\x0a", errbuf );
-		(void) wsk_send(ctx, buffer, n);
+			"\x0d\x0a", size > 0 ? errbuf : "(no error info available)");
+		(void) wsk_sendall(ctx, buffer, n);
 	}
 }
 
@@ -164,7 +171,7 @@ read_directory(wsk_ctx_t *ctx, const char * parent_path)
 
     retcode = -1;
 
-    buffer = wsk_alloc_block(ctx, 1024);
+    buffer = wsk_alloc_block(ctx, 4096);
 
 	if ( strcmp(parent_path, "/") == 0 )
 	{
@@ -177,7 +184,7 @@ read_directory(wsk_ctx_t *ctx, const char * parent_path)
 			n = sprintf((char*)buffer, "HTTP/1.0 400 Incorrect directory path \"%s\"\x0d\x0a"
 				"Server: libwebsockets\x0d\x0a"
 				"\x0d\x0a", parent_path);
-			(void) wsk_send(ctx, buffer, n);
+			(void) wsk_sendall(ctx, buffer, n);
 			retcode = 0;
 		}
 		else 

@@ -84,7 +84,7 @@ localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
             LOG_DBG("Parameter %s=\"%s\"", pname, q);
         }
         // Read the specified directory and send it back
-        if (read_directory(ctx, path) != 0) {
+        if (read_directory(ctx, path) < 0) {
             LOG_ERR("Error reading directory \"%s\"", path);
             goto fail; }
     }

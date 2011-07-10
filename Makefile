@@ -11,7 +11,7 @@ WSFSUBDIR = third-party/websockify
 
 CFLAGS += -Wall -I $(WSFSUBDIR)
 
-SRC = mylocalhost.c
+SRC = mylocalhost.c localfs.c
 
 OBJ = $(SRC:.c=.o)
 

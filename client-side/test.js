@@ -62,10 +62,11 @@ function read_directory( folder_path )
         websock.onmessage = function got_packet(msg) {
 			if (msg.data != "") {
 				var data = JSON.parse( msg.data );
-				//console.log( "directory = " + data.isDirectory );
+                var filename = decodeURIComponent(data.name);
+				//console.log("Entry \""+filename+"\" is a: " + (data.isDirectory ? "folder" : "file"));
 				var div = document.createElement("div");
 				div.className = data.isDirectory ? "folder" : "file";
-				div.appendChild( document.createTextNode( data.name ) );
+				div.appendChild( document.createTextNode(filename) );
 				// TODO: handle "." and ".." correctly
 				div.path = folder_path + data.name + (data.isDirectory ? '/' : '');
 				if ( data.isDirectory ) 

@@ -19,11 +19,12 @@
 
 /* Windows/Visual Studio quirks */
 
-#pragma warning(disable:4996)
-
 #ifdef _WIN32
+
+#pragma warning(disable:4996)
 #define close _close
 #define strdup _strdup
+
 #endif
 
 /* Debugging */

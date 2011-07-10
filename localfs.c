@@ -5,7 +5,7 @@
 #include <websocket/websocket.h>
 #include "localfs.h"
 
-static int
+int
 read_directory(wsk_ctx_t *ctx, const char *path)
 {
     DIR *dir;
@@ -24,12 +24,13 @@ read_directory(wsk_ctx_t *ctx, const char *path)
     if (dir == NULL) {
         len = snprintf(msg, 1024, "{ \"error\": \"Failed to open the directory\" }" );
         wsk_send(ctx, (wsk_byte_t*) msg, len);
-        LOG_ERR("Failed to open the directory \"%s\"", path);
+        //LOG_ERR("Failed to open the directory \"%s\"", path);
         goto fail; }
     
     while ((de = readdir(dir)) != NULL) {
         wsv_url_encode(de->d_name, encoded, 256);
-        len = snprintf(msg, 1024, "{ \"name\": \"%s\", \"isDirectory\": \"%s\" }", 
+        printf("Entry \"%s\" is a %s\n", de->d_name, de->d_type == DT_DIR ? "folder" : "file");
+        len = snprintf(msg, 1024, "{ \"name\": \"%s\", \"isDirectory\": %s }", 
                        encoded, de->d_type == DT_DIR ? "true" : "false" );
         wsk_send(ctx, (wsk_byte_t*) msg, len);
     }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <style type="text/css">
+
+      p.error {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        background-color: #f55;
+      }
+
+      div#container {
+        text-align: center;
+      }
+
+      div.directory * {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        padding: 0.1em;
+        overflow: hidden;
+      }
+
+      div.directory {
+        width: 50%;
+        display: inline-block;
+        text-align: left;
+        -webkit-column-count: 3;
+      }
+
+      div.directory * {
+        cursor: pointer;
+      }
+
+      div.directory div.folder {
+        margin: 2px;
+        background-color: #5d2;
+        border: solid 1px #881;
+      }
+
+      div.directory div.folder:hover {
+        background-color: #77ee33;
+      }
+
+      div.directory div.file {
+        background-color: #ed0;
+      }
+
+    </style>
+
+    <script type="text/javascript" src="imap.js"></script>
+
+    <script type="text/javascript" src="test_imap.js"></script>
+
+  </head>
+  <body onload="init()">
+    <h1 align="center">IMAP (through MyLocalHost) test page</h1>
+    <div id="container">
+      <div id="output" class="directory">
+      </div>
+    </div>
+  </body>
+</html>

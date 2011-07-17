@@ -145,9 +145,7 @@ function do_recv() {
 
 
 that.connect = function(host, port, encrypt, path) {
-    var host = host,
-        port = port,
-        scheme = "ws://", uri;
+    var scheme = "ws://", uri;
 
     Util.Debug(">> connect");
     if ((!host) || (!port)) {

@@ -50,7 +50,54 @@ static struct option options[] = {
 };
 
 static int 
-localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
+tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
+{
+    wsv_url_parsing_t *par;
+    const char *params;
+    const char *name, *value;
+    size_t nsize, vsize;
+    char *host;
+    unsigned port;
+    
+    params = strrchr(location, '?');
+    if (!params) {
+        LOG_ERR("No parameters specified with the TCP proxying command");
+        goto fail; }
+        
+    par = wsv_begin_url_param_parsing(params);
+    if (par == NULL) {
+            LOG_ERR("Failed to start parsing URL parameters");
+        goto fail; }
+        
+    while (wsv_parse_next_url_parameter(par, &name, &nsize, &value, &vsize) == WSVUP_OK) {
+        LOG_DBG("Parameter: %.*s = \"%.*s\"", nsize, name, vsize, value);
+        if (nsize == 4 && strncmp(name, "host", nsize) == 0) {
+            host = strndup(value, vsize);
+            LOG_DBG("Got host parameter: \"%s\"", host);
+        }
+        else if (nsize == 4 && strncmp(name, "port", nsize) == 0) {
+            port = atoi(value);
+            LOG_DBG("Got port parameter: %u", port);
+        }
+        else {
+            LOG_ERR("Unknown parameter for TCP proxying - full line: \"%s\"", params);
+            wsv_done_url_param_parsing(par);
+            goto fail; 
+        }
+    }
+    wsv_done_url_param_parsing(par);
+    
+    LOG_DBG("TCP proxying command receiced, host = \"%s\", port = %u", host, port);
+    LOG_DBG("Not implemented yet");
+    
+    return 0;
+    
+fail:
+    return -1;
+}
+
+static int 
+connection_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
 {
     const char *p;
     size_t n;
@@ -89,6 +136,9 @@ localfs_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
             LOG_ERR("Error reading directory \"%s\"", path);
             goto fail; }
     }
+    else if (strcmp(command, "$tcp") == 0) {
+        return tcp_proxying(ctx, location, userdata);
+    }
     else { LOG_ERR("Unknown command \"%s\"", command); goto fail; }
 
     return 0;
@@ -123,7 +173,7 @@ main(int argc, char **argv)
     settings.protocols = NULL;
     settings.userdata = NULL;
 
-    wsksvc = wsk_extend_webservice(&settings, localfs_handler, NULL);
+    wsksvc = wsk_extend_webservice(&settings, connection_handler, NULL);
     if (!wsksvc) {
         fprintf(stderr, "Failed to extend web service with WebSocket protocol");
         return -1;

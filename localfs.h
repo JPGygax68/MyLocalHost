@@ -1,9 +1,9 @@
-#ifndef __FILESYSTEM_H
-#define __FILESYSTEM_H
+#ifndef __LOCALFS_W32_H
+#define __LOCALFS_W32_H
+
+#include <websocket/websocket.h>
 
 int 
-read_directory(wsk_ctx_t *ctx, const char * parent_path);
+list_directory(wsk_ctx_t *ctx, const char * parent_path);
 
-//size_t normalized_path_to_native( const char * normalized, char * native, size_t bufsize );
-
-#endif // __FILESYSTEM_H
+#endif // __LOCALFS_W32_H

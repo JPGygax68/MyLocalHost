@@ -20,11 +20,11 @@
 /* Windows/Visual Studio quirks */
 
 #ifdef _WIN32
-
 #pragma warning(disable:4996)
 #define close _close
 #define strdup _strdup
-
+#else
+#define closesocket close
 #endif
 
 /* Debugging */
@@ -58,6 +58,8 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
     size_t nsize, vsize;
     char *host;
     unsigned port;
+    int tsock = 0;
+    struct sockaddr_in taddr;
     
     params = strrchr(location, '?');
     if (!params) {
@@ -86,13 +88,31 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
         }
     }
     wsv_done_url_param_parsing(par);
-    
     LOG_DBG("TCP proxying command receiced, host = \"%s\", port = %u", host, port);
-    LOG_DBG("Not implemented yet");
+    
+    tsock = socket(AF_INET, SOCK_STREAM, 0);
+    if (tsock < 0) {
+        LOG_ERR("Could not create target socket: %s", strerror(errno));
+        goto fail; }
+    memset((char *) &taddr, 0, sizeof(taddr));
+    taddr.sin_family = AF_INET;
+    taddr.sin_port = htons(port);
+    
+    /* Resolve target address */
+    if (wsv_resolve_host(&taddr.sin_addr, host) < -1) {
+        LOG_ERR("Could not resolve target address: %s\n", strerror(errno));
+        goto fail; }
+    
+    if (connect(tsock, (struct sockaddr *) &taddr, sizeof(taddr)) < 0) {
+        LOG_ERR("Could not connect to target: %s\n", strerror(errno));
+        goto fail; }
+    
+    wsp_do_proxy(ctx, tsock);
     
     return 0;
     
 fail:
+    if (tsock != 0) closesocket(tsock);
     return -1;
 }
 

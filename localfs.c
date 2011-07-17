@@ -6,7 +6,7 @@
 #include "localfs.h"
 
 int
-read_directory(wsk_ctx_t *ctx, const char *path)
+list_directory(wsk_ctx_t *ctx, const char *path)
 {
     DIR *dir;
     struct dirent *de;

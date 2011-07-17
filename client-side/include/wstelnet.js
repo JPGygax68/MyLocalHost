@@ -268,7 +268,8 @@ function constructor() {
             return true;
 
         keysym = getKeysym(e);
-
+        console.log("ch = " + keysym);
+        
         if (keysym < 128) {
             if (e.ctrlKey) {
                 if (keysym == 64) {
@@ -307,8 +308,10 @@ function constructor() {
                 str = '\x1b[C'; break;
             case 65364: // Down arrow 
                 str = '\x1b[B'; break;
+            case 65535: // DEL
+                str = '\x1b[3~'; break;
             default:
-                Util.Info("Unrecoginized keysym " + keysym);
+                Util.Info("Unrecognized keysym " + keysym);
             }
         }
 

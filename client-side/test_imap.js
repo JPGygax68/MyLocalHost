@@ -30,7 +30,7 @@ function get_appropriate_ws_base_url()
     return url;
 }
 
-function connect()
+function connectImap(username, password)
 {
     console.log("connect()");
     
@@ -38,11 +38,16 @@ function connect()
     url += '/$tcp?host=' + escape('practicomp.ch') + '&port=143';
     console.log( url );
     
-    var imap = new IMAP.Client(url);
-}
-
-function init()
-{
-	console.log("init()");
-    window.setTimeout(function() { connect(); }, 100 );
+    var folderListDiv = document.getElementById('folderList');
+    
+    var imap = new IMAP.Client(url, username, password, {
+        onListData: function (folder) {
+            console.log("My onListData handler was called, folder name is \""+folder.name+"\"");
+            //console.log(folder);
+            var folderDiv = document.createElement("div");
+            folderDiv.className = "folder";
+            folderDiv.innerHTML = folder.name; // TODO: proper encoding
+            folderListDiv.appendChild(folderDiv);
+        }
+    } );
 }

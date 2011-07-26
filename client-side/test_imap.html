@@ -14,49 +14,109 @@
         text-align: center;
       }
 
-      div.directory * {
-        margin-top: 0.2em;
-        margin-bottom: 0.2em;
-        padding: 0.1em;
-        overflow: hidden;
-      }
-
-      div.directory {
+      .folderList {
         width: 50%;
         display: inline-block;
         text-align: left;
         -webkit-column-count: 3;
       }
 
-      div.directory * {
+      .folderList * {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        padding: 0.1em;
+        overflow: hidden;
+      }
+
+      .folderList * {
         cursor: pointer;
       }
 
-      div.directory div.folder {
+      .folderList .folder {
         margin: 2px;
-        background-color: #5d2;
+        background-color: #ee2;
         border: solid 1px #881;
       }
 
-      div.directory div.folder:hover {
+      .folderList .folder:hover {
         background-color: #77ee33;
       }
 
-      div.directory div.file {
+      .folderList .file {
         background-color: #ed0;
       }
 
+      input[type=text] {
+        background-color: #ffa;
+      }
+      input[type=password] {
+        background-color: #ffa;
+      }
+
     </style>
+
+    <!-- Uncomment this block to support TLS in IMAP.
+    <script type="text/javascript" src="forge/util.js"></script>
+    <script type="text/javascript" src="forge/sha1.js"></script>
+    <script type="text/javascript" src="forge/sha256.js"></script>
+    <script type="text/javascript" src="forge/md5.js"></script>
+    <script type="text/javascript" src="forge/aes.js"></script>
+    <script type="text/javascript" src="forge/asn1.js"></script>
+    <script type="text/javascript" src="forge/hmac.js"></script>
+    <script type="text/javascript" src="forge/oids.js"></script>
+    <script type="text/javascript" src="forge/rsa.js"></script>
+    <script type="text/javascript" src="forge/pki.js"></script>
+    <script type="text/javascript" src="forge/prng.js"></script>
+    <script type="text/javascript" src="forge/random.js"></script>
+    <script type="text/javascript" src="forge/tls.js"></script>
+    //-->
+
+    <script type="text/javascript" src="jquery/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery.cookie.js"></script>
 
     <script type="text/javascript" src="imap.js"></script>
 
     <script type="text/javascript" src="test_imap.js"></script>
 
+    <script type="text/javascript">
+
+        function init() {
+            console.log("init()");
+            if ($.cookie('username') !== null) {
+                document.getElementById('username').value = $.cookie('username');
+                if ($.cookie('password') !== null) {
+                    document.getElementById('password').value = $.cookie('password');
+                }
+                connectImap($.cookie('username'), $.cookie('password'));
+            }
+            document.getElementById('username').focus();
+        }
+
+        function connectClicked(event) {
+            var username = document.getElementById('username').value;
+            if (typeof(username) === 'undefined') {
+                alert("You must specify a username");
+                return };
+            var password = document.getElementById('password').value;
+            connectImap(username, password);
+            $.cookie('username', username);
+            $.cookie('password', password);
+        }
+
+    </script>
+
   </head>
   <body onload="init()">
     <h1 align="center">IMAP (through MyLocalHost) test page</h1>
     <div id="container">
-      <div id="output" class="directory">
+      <form>
+        <p>
+          Username: <input id="username" type="text"></input>
+          Password: <input id="password" type="password"></input>
+          <input type="button" value="Connect" onclick="connectClicked(event)"/>
+        </p>
+      </form>
+      <div id="folderList" class="folderList">
       </div>
     </div>
   </body>

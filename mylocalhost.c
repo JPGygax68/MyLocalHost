@@ -17,6 +17,10 @@
 #include <wsproxy/wsproxy.h>
 #include "localfs.h"
 
+#ifdef _WIN32
+#include <WinSock.h>
+#endif
+
 /* Windows/Visual Studio quirks */
 
 #ifdef _WIN32
@@ -74,7 +78,8 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
     while (wsv_parse_next_url_parameter(par, &name, &nsize, &value, &vsize) == WSVUP_OK) {
         LOG_DBG("Parameter: %.*s = \"%.*s\"", nsize, name, vsize, value);
         if (nsize == 4 && strncmp(name, "host", nsize) == 0) {
-            host = strndup(value, vsize);
+			host = (char*) malloc(vsize+1);
+			strncpy(host, value, vsize+1);
             LOG_DBG("Got host parameter: \"%s\"", host);
         }
         else if (nsize == 4 && strncmp(name, "port", nsize) == 0) {

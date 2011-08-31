@@ -60,6 +60,7 @@ function read_directory( folder_path )
         }
         
         websock.onmessage = function got_packet(msg) {
+			console.log('websock.onmessage');
 			if (msg.data != "") {
 				console.log(msg.data);
 				var data = JSON.parse(msg.data);
@@ -68,7 +69,7 @@ function read_directory( folder_path )
 				}
 				else {
 					var filename = unescape(data.name);
-					//console.log("Entry \""+filename+"\" is a: " + (data.isDirectory ? "folder" : "file"));
+					console.log("Entry \""+filename+"\" is a: " + (data.isDirectory ? "folder" : "file"));
 					var div = document.createElement("div");
 					div.className = data.isDirectory ? "folder" : "file";
 					div.appendChild( document.createTextNode(filename) );
@@ -85,8 +86,16 @@ function read_directory( folder_path )
 			}
         }
         
-        websock.onclose = function() {
-            console.log( "websocket connection CLOSED" );
+		websock.onerror = function(e) {
+			console.log('WebSocket reports error:');
+			console.log(e);
+		}
+
+        websock.onclose = function(e) {
+            console.log("websocket connection CLOSED" );
+			//console.log(e);
+			//console.log("Code:   " + e.code);
+			//console.log("Reason: " + e.reason);
         }
         
     } catch(exception) {

@@ -150,6 +150,7 @@
     <None Include="..\client-side\test.html">
       <SubType>Designer</SubType>
     </None>
+    <None Include="..\client-side\test.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\third-party\websockify\ws_vc2010\webserver\webserver.vcxproj">

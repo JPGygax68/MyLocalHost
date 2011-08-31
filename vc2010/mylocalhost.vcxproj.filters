@@ -21,6 +21,9 @@
     <None Include="..\client-side\test.html">
       <Filter>client</Filter>
     </None>
+    <None Include="..\client-side\test.js">
+      <Filter>client</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c">

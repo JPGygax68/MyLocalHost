@@ -2,12 +2,26 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mylocalhost", "mylocalhost.vcxproj", "{ADA6A5C9-000F-401F-A194-A7E23F11DA44}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C615A31D-DC50-4422-8189-699EF994EF15} = {C615A31D-DC50-4422-8189-699EF994EF15}
+		{17253650-23FD-4B18-A108-768BB1EA53B1} = {17253650-23FD-4B18-A108-768BB1EA53B1}
+		{5D9523C2-9051-4417-8B08-DE97F4D0702D} = {5D9523C2-9051-4417-8B08-DE97F4D0702D}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webserver", "..\third-party\websockify\ws_vc2010\webserver\webserver.vcxproj", "{17253650-23FD-4B18-A108-768BB1EA53B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websocket", "..\third-party\websockify\websocket\vs_2010\websocket.vcxproj", "{C615A31D-DC50-4422-8189-699EF994EF15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{17253650-23FD-4B18-A108-768BB1EA53B1} = {17253650-23FD-4B18-A108-768BB1EA53B1}
+		{0946058B-4B85-4390-BC9E-631329879F14} = {0946058B-4B85-4390-BC9E-631329879F14}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websocket", "..\third-party\websockify\ws_vc2010\websocket\websocket.vcxproj", "{C615A31D-DC50-4422-8189-699EF994EF15}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wsproxy", "..\third-party\websockify\wsproxy\vs_2010\wsproxy.vcxproj", "{5D9523C2-9051-4417-8B08-DE97F4D0702D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C615A31D-DC50-4422-8189-699EF994EF15} = {C615A31D-DC50-4422-8189-699EF994EF15}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wsproxy", "..\third-party\websockify\ws_vc2010\wsproxy\wsproxy.vcxproj", "{5D9523C2-9051-4417-8B08-DE97F4D0702D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webserver", "..\third-party\websockify\webserver\vs_2010\webserver.vcxproj", "{17253650-23FD-4B18-A108-768BB1EA53B1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPTL", "..\third-party\websockify\sptl\vs_2010\sptl.vcxproj", "{0946058B-4B85-4390-BC9E-631329879F14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +39,6 @@ Global
 		{ADA6A5C9-000F-401F-A194-A7E23F11DA44}.Release static|Win32.Build.0 = Release static|Win32
 		{ADA6A5C9-000F-401F-A194-A7E23F11DA44}.Release|Win32.ActiveCfg = Release|Win32
 		{ADA6A5C9-000F-401F-A194-A7E23F11DA44}.Release|Win32.Build.0 = Release|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug static|Win32.ActiveCfg = Debug static|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug static|Win32.Build.0 = Debug static|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug|Win32.Build.0 = Debug|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release static|Win32.ActiveCfg = Release static|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release static|Win32.Build.0 = Release static|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release|Win32.ActiveCfg = Release|Win32
-		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release|Win32.Build.0 = Release|Win32
 		{C615A31D-DC50-4422-8189-699EF994EF15}.Debug static|Win32.ActiveCfg = Debug static|Win32
 		{C615A31D-DC50-4422-8189-699EF994EF15}.Debug static|Win32.Build.0 = Debug static|Win32
 		{C615A31D-DC50-4422-8189-699EF994EF15}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -49,6 +55,22 @@ Global
 		{5D9523C2-9051-4417-8B08-DE97F4D0702D}.Release static|Win32.Build.0 = Release static|Win32
 		{5D9523C2-9051-4417-8B08-DE97F4D0702D}.Release|Win32.ActiveCfg = Release|Win32
 		{5D9523C2-9051-4417-8B08-DE97F4D0702D}.Release|Win32.Build.0 = Release|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug static|Win32.ActiveCfg = Debug static|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug static|Win32.Build.0 = Debug static|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Debug|Win32.Build.0 = Debug|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release static|Win32.ActiveCfg = Release static|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release static|Win32.Build.0 = Release static|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release|Win32.ActiveCfg = Release|Win32
+		{17253650-23FD-4B18-A108-768BB1EA53B1}.Release|Win32.Build.0 = Release|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Debug static|Win32.ActiveCfg = Debug|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Debug static|Win32.Build.0 = Debug|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Debug|Win32.Build.0 = Debug|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Release static|Win32.ActiveCfg = Release|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Release static|Win32.Build.0 = Release|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Release|Win32.ActiveCfg = Release|Win32
+		{0946058B-4B85-4390-BC9E-631329879F14}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

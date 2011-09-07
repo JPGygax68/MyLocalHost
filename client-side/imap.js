@@ -39,7 +39,9 @@ var IMAP = (function() {
                     if (msg.data != "") {
                         console.log(msg.data);
                         if (!gotCaps) {
-                            this.send(makeTag() + " CAPABILITY\n");
+                            var msg = makeTag() + " CAPABILITY\n";
+							console.log("Sending: " + msg);
+                            this.send(msg);
                             gotCaps = true;
                         }
                     }

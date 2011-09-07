@@ -24,6 +24,15 @@
     <None Include="..\client-side\test.js">
       <Filter>client</Filter>
     </None>
+    <None Include="..\client-side\imap.js">
+      <Filter>client</Filter>
+    </None>
+    <None Include="..\client-side\test_imap.html">
+      <Filter>client</Filter>
+    </None>
+    <None Include="..\client-side\test_imap.js">
+      <Filter>client</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c">

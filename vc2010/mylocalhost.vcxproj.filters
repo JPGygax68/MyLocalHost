@@ -33,6 +33,12 @@
     <None Include="..\client-side\test_imap.js">
       <Filter>client</Filter>
     </None>
+    <None Include="..\client-side\wstelnet.html">
+      <Filter>client</Filter>
+    </None>
+    <None Include="..\client-side\include\websock.js">
+      <Filter>client</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c">

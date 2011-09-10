@@ -149,12 +149,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\client-side\imap.js" />
+    <None Include="..\client-side\include\websock.js" />
     <None Include="..\client-side\test.html">
       <SubType>Designer</SubType>
     </None>
     <None Include="..\client-side\test.js" />
     <None Include="..\client-side\test_imap.html" />
     <None Include="..\client-side\test_imap.js" />
+    <None Include="..\client-side\wstelnet.html" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c" />

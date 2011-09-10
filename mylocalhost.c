@@ -64,6 +64,7 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
     unsigned port;
     int tsock = 0;
     struct sockaddr_in taddr;
+	int err;
     
     params = strrchr(location, '?');
     if (!params) {
@@ -108,8 +109,8 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
         LOG_ERR("Could not resolve target address: %s\n", strerror(errno));
         goto fail; }
     
-    if (connect(tsock, (struct sockaddr *) &taddr, sizeof(taddr)) < 0) {
-        LOG_ERR("Could not connect to target: %s\n", strerror(errno));
+    if ((err = connect(tsock, (struct sockaddr *) &taddr, sizeof(taddr))) < 0) {
+        LOG_ERR("Could not connect to target: code %d, error %s\n", err, wsv_describe_socket_error(0));
         goto fail; }
     
     wsp_do_proxy(ctx, tsock);

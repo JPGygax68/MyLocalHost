@@ -14,6 +14,10 @@
  * read binary data off of the receive queue.
  */
 
+if (window.MozWebSocket) {
+    console.log("Mozilla Web Sockets detected");
+    window.WebSocket = window.MozWebSocket;
+}
 
 // Load Flash WebSocket emulator if needed
 

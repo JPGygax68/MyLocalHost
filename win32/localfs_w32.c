@@ -23,7 +23,7 @@ static size_t
 w32_get_error_string( char * buffer, size_t len )
 {
     size_t size;
-    size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)buffer, len, NULL);
+    size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_SYS_DEFAULT), (LPTSTR)buffer, len, NULL);
     if (size == 0) {
         fprintf(stderr, "%s: FormatMessage() failed: %\n", __FUNCTION__, GetLastError());
     }

@@ -159,6 +159,17 @@
     <None Include="..\client-side\wstelnet.html" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\third-party\websockify\ws_vc2010\webserver\webserver.vcxproj">
+      <Project>{17253650-23fd-4b18-a108-768bb1ea53b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\third-party\websockify\ws_vc2010\websocket\websocket.vcxproj">
+      <Project>{c615a31d-dc50-4422-8189-699ef994ef15}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\third-party\websockify\ws_vc2010\wsproxy\wsproxy.vcxproj">
+      <Project>{5d9523c2-9051-4417-8b08-de97f4d0702d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\mylocalhost.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt_long.c" />

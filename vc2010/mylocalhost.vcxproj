@@ -158,7 +158,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="..\client-side\test_imap.js" />
-    <None Include="..\client-side\wstelnet.html" />
+    <None Include="..\client-side\wstelnet.html">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c" />

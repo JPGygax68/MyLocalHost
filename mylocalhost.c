@@ -1,8 +1,9 @@
 /*
- * mylocalhost
+ * mylocalhost.c
+ *
+ * Generic WebSocket gateway to a PC's resources.
  *
  * Copyright (C) 2011 Jean-Pierre Gygax <gygax@practicomp.ch>
- *
  */
 
 #include <stdio.h>

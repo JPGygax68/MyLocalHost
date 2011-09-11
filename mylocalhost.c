@@ -45,13 +45,13 @@ fprintf(stream, "\n" ); \
 #define LOG_DBG LOG_MSG
 
 static struct option options[] = {
-	{ "help",	no_argument,		NULL, 'h' },
-	/* { "port",	required_argument,	NULL, 'p' },
-	{ "ssl",	no_argument,		NULL, 's' },
-	{ "killmask",	no_argument,		NULL, 'k' },
-	{ "interface",  required_argument, 	NULL, 'i' },
-	{ "closetest",  no_argument,		NULL, 'c' },*/
-	{ NULL, 0, 0, 0 }
+    { "help",    no_argument,        NULL, 'h' },
+    /* { "port",    required_argument,    NULL, 'p' },
+    { "ssl",    no_argument,        NULL, 's' },
+    { "killmask",    no_argument,        NULL, 'k' },
+    { "interface",  required_argument,     NULL, 'i' },
+    { "closetest",  no_argument,        NULL, 'c' },*/
+    { NULL, 0, 0, 0 }
 };
 
 static int 
@@ -65,7 +65,7 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
     unsigned port;
     int tsock = 0;
     struct sockaddr_in taddr;
-	int err;
+    int err;
     
     params = strrchr(location, '?');
     if (!params) {
@@ -80,8 +80,8 @@ tcp_proxying(wsk_ctx_t *ctx, const char *location, void *userdata)
     while (wsv_parse_next_url_parameter(par, &name, &nsize, &value, &vsize) == WSVUP_OK) {
         LOG_DBG("Parameter: %.*s = \"%.*s\"", nsize, name, vsize, value);
         if (nsize == 4 && strncmp(name, "host", nsize) == 0) {
-			host = (char*) malloc(vsize+1);
-			strncpy(host, value, vsize+1);
+            host = (char*) malloc(vsize+1);
+            strncpy(host, value, vsize+1);
             LOG_DBG("Got host parameter: \"%s\"", host);
         }
         else if (nsize == 4 && strncmp(name, "port", nsize) == 0) {
@@ -187,8 +187,8 @@ main(int argc, char **argv)
     wsk_service_t *wsksvc;
     //int opts = 0;
 
-	fprintf(stderr, "MyLocalHost server\n"
-			"(C) Copyright 2011 Jean-Pierre Gygax <gygax@practicomp.ch>\n" );
+    fprintf(stderr, "MyLocalHost server\n"
+            "(C) Copyright 2011 Jean-Pierre Gygax <gygax@practicomp.ch>\n" );
 
     //memset(&settings, sizeof(settings), 0);
     settings.certfile = NULL;
@@ -206,34 +206,34 @@ main(int argc, char **argv)
         return -1;
     }
     
-	while (n >= 0) {
-		n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
-		if (n < 0)
-			continue;
-		switch (n) {
-		/* case 's':
-			use_ssl = 1;
-			break; */
-		/* case 'k':
-			opts = LWS_SERVER_OPTION_DEFEAT_CLIENT_MASK;
-			break; */
-		case 'p':
-			settings.listen_port = atoi(optarg);
-			break;
-		/* case 'i':
-			strncpy(interface_name, optarg, sizeof interface_name);
-			interface_name[(sizeof interface_name) - 1] = '\0';
-			interface = interface_name;
-			break; */
-		case 'h':
-			fprintf(stderr, "Usage: mylocalhost "
-					     "[--port=<p>]\n");
-			exit(1);
-		}
-	}
+    while (n >= 0) {
+        n = getopt_long(argc, argv, "ci:khsp:", options, NULL); // TODO: adapt
+        if (n < 0)
+            continue;
+        switch (n) {
+        /* case 's':
+            use_ssl = 1;
+            break; */
+        /* case 'k':
+            opts = LWS_SERVER_OPTION_DEFEAT_CLIENT_MASK;
+            break; */
+        case 'p':
+            settings.listen_port = atoi(optarg);
+            break;
+        /* case 'i':
+            strncpy(interface_name, optarg, sizeof interface_name);
+            interface_name[(sizeof interface_name) - 1] = '\0';
+            interface = interface_name;
+            break; */
+        case 'h':
+            fprintf(stderr, "Usage: mylocalhost "
+                         "[--port=<p>]\n");
+            exit(1);
+        }
+    }
 
-	//if (!use_ssl)
-	//	cert_path = key_path = NULL;
+    //if (!use_ssl)
+    //    cert_path = key_path = NULL;
 
     wsv_start_server(&settings);
 

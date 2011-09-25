@@ -123,41 +123,72 @@ fail:
     return -1;
 }
 
-static int 
-connection_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
+static int
+extract_command(const char *location, char *buffer)
 {
     const char *p;
-    size_t n;
-    char command[64], pname[32], encoded[1024], *q;
-    char path[1024];
-    
-    printf("%s: location=%s\n", __FUNCTION__, location);
+    char *q;
 
     // Extract command (we ignore the path here)
     p = strrchr(location, '/'); assert(p);
     p++; // skip the last slash
-    for (q = command; *p && *p != '?'; p++, q ++) *q = *p; *q = '\0';
-    LOG_DBG("Command: \"%s\"", command);
-    
-    if (strcmp(command, "$directory") == 0) {
-        if (*p != '?') { LOG_ERR("Missing parameter introducer '?'"); goto fail; }
-        p ++; // skip the parameter introducer
-        // Now extract the parameters
-        while (*p) {
-            // Get the parameter name
-            for (q = pname; *p && *p != '=' && *p != '&'; p++, q++) *q = *p; *q = '\0';
-            // Now the parameter value
-            if (*p != '=') { 
-                LOG_ERR("Missing equality sign after parameter name \"%s\"", pname); 
-                goto fail; }                
-            for (p++, q = encoded; *p && *p != '&'; p++, q++) *q = *p; *q = '\0';
-            // Parameter name decides where the decoded value will go
-            if (strcmp(pname, "path") == 0) { q = path, n = sizeof(path); }
-            else { LOG_ERR("Unknown parameter \"%s\"", pname); goto fail; }
-            // Now decode the parameter value
-            wsv_url_decode(encoded, p - encoded, q, n, 0);
-            LOG_DBG("Parameter %s=\"%s\"", pname, q);
+    for (q = buffer; *p && *p != '?'; p++, q ++) *q = *p; *q = '\0';
+    LOG_DBG("Command: \"%s\"", buffer);
+
+    return 1;
+}
+
+static int
+extract_parameter(const char *location, const char *name, char *buffer, size_t bsize)
+{
+    const char *p, *q;
+    size_t n;
+
+    p = strchr(location, '?');
+    if (p == NULL) return -1;
+    p ++;
+
+    while (p != NULL && *p != '\0')
+    {
+        if ((q = strchr(p, '=')) == NULL) {
+            LOG_ERR("Valueless parameter string");
+            return 0; }
+        // Is this the parameter we've been looking for ?
+        if (strncmp(name, p, q - p) == 0) {
+            p = q + 1;
+            q = strchr(p, '&');
+            n = q == NULL ? strlen(p) : q - p;
+            if (wsv_url_decode(p, n, buffer, bsize, 0) == 0) {
+                LOG_ERR("Error decoding parameter \"%s\"", name );
+                return 0; }
+            return 1;
         }
+        else {
+            p = strchr(p, '&');
+            if (p != NULL) p ++;
+        }
+    }
+
+    return 0; // parameter not found
+}
+
+static int
+connection_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
+{
+    char command[64];
+    char path[1024];
+    
+    LOG_DBG("%s: location=%s\n", __FUNCTION__, location);
+
+    if (!extract_command(location, command)) {
+        LOG_ERR("No command passed in WebSocket connection header");
+        goto fail; }
+
+    if (strcmp(command, "$directory") == 0) {
+        // Get path
+        if (!extract_parameter(location, "path", path, 1024)) {
+            LOG_ERR("$directory command received but no path specified");
+            goto fail; }
         // Read the specified directory and send it back
         if (list_directory(ctx, path) < 0) {
             LOG_ERR("Error listing directory \"%s\"", path);

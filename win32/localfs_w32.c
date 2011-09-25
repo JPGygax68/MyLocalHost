@@ -20,7 +20,7 @@
 /* Private routines */
 
 static size_t 
-w32_get_error_string( char * buffer, size_t len )
+get_error_string( char * buffer, size_t len )
 {
     size_t size;
     size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
@@ -154,7 +154,7 @@ list_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
 	{
 		char errbuf[1024+1], encoded[1024];
         size_t size;
-		size = w32_get_error_string(errbuf, 1024);
+		size = get_error_string(errbuf, 1024);
         wsv_url_encode(errbuf, encoded, 1024);
         n = sprintf((char*)buffer, "{ \"error\": \"%s\" }", size > 0 ? encoded : "(no error info available)");
 		(void) wsk_sendall(ctx, buffer, n);

@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c" />
+    <ClCompile Include="..\tcpproxying.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt_long.c" />
     <ClCompile Include="..\urlencode.c" />

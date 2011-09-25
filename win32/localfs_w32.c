@@ -6,6 +6,8 @@
 
 #include "../localfs.h"
 
+#include "localfs_w32.h"
+
 #define BUFFER_SIZE 2048
 
 /* Windows/Visual Studio quirks */
@@ -18,18 +20,6 @@
 #endif
 
 /* Private routines */
-
-static size_t 
-get_error_string( char * buffer, size_t len )
-{
-    size_t size;
-    size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_SYS_DEFAULT), (LPTSTR)buffer, len, NULL);
-    if (size == 0) {
-        fprintf(stderr, "%s: FormatMessage() failed: %\n", __FUNCTION__, GetLastError());
-    }
-    return size;
-}
 
 static int 
 read_drive_list(wsk_ctx_t *ctx, wsk_byte_t *buffer)
@@ -65,7 +55,7 @@ read_drive_list(wsk_ctx_t *ctx, wsk_byte_t *buffer)
   Returns 0 if an error occurred ("incorrect normalized path").
   The length of the native buffer (number of characters) is assumed to be FILENAME_MAX.
  */
-static int 
+int 
 normalized_path_to_native(const char * normalized, char *native)
 {
 	size_t nsize;
@@ -151,7 +141,7 @@ list_folder_directory(wsk_ctx_t *ctx, const char * path, wsk_byte_t *buffer)
 	{
 		char errbuf[1024+1], encoded[1024];
         size_t size;
-		size = get_error_string(errbuf, 1024);
+		size = get_error_string_w32(errbuf, 1024);
         wsv_url_encode(errbuf, encoded, 1024);
         n = sprintf((char*)buffer, "{ \"error\": \"%s\" }", size > 0 ? encoded : "(no error info available)");
 		(void) wsk_sendall(ctx, buffer, n);
@@ -160,6 +150,18 @@ list_folder_directory(wsk_ctx_t *ctx, const char * path, wsk_byte_t *buffer)
 }
 
 /* Public functions */
+
+size_t 
+get_error_string_w32(char * buffer, size_t len)
+{
+    size_t size;
+    size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_SYS_DEFAULT), (LPTSTR)buffer, len, NULL);
+    if (size == 0) {
+        fprintf(stderr, "%s: FormatMessage() failed: %\n", __FUNCTION__, GetLastError());
+    }
+    return size;
+}
 
 int 
 list_directory(wsk_ctx_t *ctx, const char * parent_path)

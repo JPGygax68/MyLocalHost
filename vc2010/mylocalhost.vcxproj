@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\mylocalhost.c" />
+    <ClCompile Include="..\readfile.c" />
     <ClCompile Include="..\tcpproxying.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt.c" />
     <ClCompile Include="..\third-party\websockify\win32\getopt_long.c" />
@@ -171,8 +172,9 @@
     <ClCompile Include="..\win32\localfs_w32.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\localfs.h" />
     <ClInclude Include="..\urlencode.h" />
-    <ClInclude Include="..\win32\localfs.h" />
+    <ClInclude Include="..\win32\localfs_w32.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\third-party\websockify\webserver\vs_2010\webserver.vcxproj">

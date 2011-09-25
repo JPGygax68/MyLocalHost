@@ -59,12 +59,18 @@
     <ClCompile Include="..\tcpproxying.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\readfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\urlencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\win32\localfs.h">
+    <ClInclude Include="..\win32\localfs_w32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\localfs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

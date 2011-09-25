@@ -14,36 +14,46 @@
         text-align: center;
       }
 
-      div.directory * {
+      div#output * {
         margin-top: 0.2em;
         margin-bottom: 0.2em;
         padding: 0.1em;
         overflow: hidden;
       }
 
-      div.directory {
+      div#output {
         width: 50%;
         display: inline-block;
         text-align: left;
-        -webkit-column-count: 3;
       }
 
-      div.directory * {
+      div#output div.directory {
+        -webkit-column-count: 3;
+        -mozkit-column-count: 3;
+      }
+      
+      div#output * {
         cursor: pointer;
       }
 
-      div.directory div.folder {
+      div#output div.folder {
         margin: 2px;
         background-color: #5d2;
         border: solid 1px #881;
       }
 
-      div.directory div.folder:hover {
+      div#output div.folder:hover {
         background-color: #77ee33;
       }
 
-      div.directory div.file {
+      div#output div.file {
         background-color: #ed0;
+      }
+      
+      div#output pre.file_content {
+        margin: 2px;
+        border: solid 1px #881;
+        background-color: #7df;
       }
 
     </style>
@@ -54,7 +64,7 @@
   <body onload="init()">
     <h1 align="center">Local Proxy test page</h1>
     <div id="container">
-      <div id="output" class="directory">
+      <div id="output">
       </div>
     </div>
   </body>

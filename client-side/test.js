@@ -56,7 +56,7 @@ function read_directory( folder_path )
     try {
         websock.onopen = function() {
             console.log( "websocket connection opened" );
-            document.getElementById("output").innerHTML = '';
+            document.getElementById("output").innerHTML = '<div class="directory"></div>';
         }
         
         websock.onmessage = function got_packet(msg) {
@@ -81,7 +81,12 @@ function read_directory( folder_path )
 							read_directory( this.path );
 						}, false );
 					}
-					document.getElementById("output").appendChild( div );
+					else {
+						div.addEventListener( 'click', function() {
+							read_file( this.path );
+						}, false );
+					}
+					document.getElementById("output").firstChild.appendChild( div );
 				}
 			}
         }
@@ -96,6 +101,61 @@ function read_directory( folder_path )
 			console.log(e);
 			console.log("Code:   " + e.code);
 			console.log("Reason: " + e.reason);
+        }
+        
+    } catch(exception) {
+        alert('<p>Error' + exception + '</p>');
+    }
+}
+
+function make_readfile_command( file_path )
+{
+    var cmd;
+    cmd = "$readfile?path=" + encodeURIComponent(file_path);
+    return cmd;
+}
+
+function read_file( file_path )
+{
+    console.log("read_file( \""+file_path+"\" )");
+    
+    var url = get_appropriate_ws_base_url();
+    url += '/' + make_readfile_command( file_path );
+    console.log( url );
+    
+    var websock = new WebSocket(url);
+
+	var text = "";
+    
+    try {
+        websock.onopen = function() {
+            console.log( "websocket connection opened" );
+            document.getElementById("output").innerHTML = '';
+        }
+        
+        websock.onmessage = function got_packet(msg) {
+			console.log('websock.onmessage');
+			if (msg.data != "") {
+				//console.log(msg.data);
+				text += msg.data;
+			}
+        }
+        
+		websock.onerror = function(e) {
+			console.log('WebSocket reports error:');
+			console.log(e);
+		}
+
+        websock.onclose = function(e) {
+            console.log("websocket connection CLOSED:" );
+			//console.log(e);
+			//console.log("Code:   " + e.code);
+			//console.log("Reason: " + e.reason);
+			console.log(text);
+			var pre = document.createElement("pre");
+			pre.className = "file_content";
+			pre.appendChild( document.createTextNode(text) );
+			document.getElementById("output").appendChild( pre );
         }
         
     } catch(exception) {

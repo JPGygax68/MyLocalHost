@@ -125,6 +125,16 @@ connection_handler(wsk_ctx_t *ctx, const char *location, void *userdata)
             LOG_ERR("Error listing directory \"%s\"", path);
             goto fail; }
     }
+    else if (strcmp(command, "$readfile") == 0) {
+        // Get path
+        if (!extract_parameter(location, "path", path, 1024)) {
+            LOG_ERR("$readfile command received but no path specified");
+            goto fail; }
+        // Read and send the specified file
+        if (read_file(ctx, path) < 0) {
+            LOG_ERR("Error reading file \"%s\"", path);
+            goto fail; }
+    }
     else if (strcmp(command, "$tcp") == 0) {
         return tcp_proxying(ctx, location, userdata);
     }

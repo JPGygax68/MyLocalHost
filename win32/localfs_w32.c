@@ -61,21 +61,21 @@ read_drive_list(wsk_ctx_t *ctx, wsk_byte_t *buffer)
 }
 
 /* We're assuming that we get the path in normalized form (one root), encoded in UTF-8. 
-  We need it in native form (drive letters), and in UTF-16.
+  We need it in native form (drive letters, also UTF-8.
   Returns 0 if an error occurred ("incorrect normalized path").
-  The length of the native buffer (number of wide characters) is assumed to be FILENAME_MAX.
+  The length of the native buffer (number of characters) is assumed to be FILENAME_MAX.
  */
 static int 
-normalized_path_to_windows(const char * normalized, wchar_t *native)
+normalized_path_to_native(const char * normalized, char *native)
 {
 	size_t nsize;
 	const char * p;
-	wchar_t *q;
+	char *q;
 
 	p = normalized;
 	nsize = strnlen( normalized, FILENAME_MAX );
 	q = native;
-	*q = L'\0';
+	*q = '\0';
 
 	// Absolute path ?
 	if ( normalized[0] == '/' )
@@ -87,35 +87,35 @@ normalized_path_to_windows(const char * normalized, wchar_t *native)
 		drive = *p ++;
 		if ( *p && *p != '/' ) return 0; // illegal: drive letter must be followed by nothing or a slash
 		if ( *p ) p ++;
-		*q ++ = (wchar_t) toupper(drive);
-		*q ++ = L':';
-		*q ++ = L'\\';
+		*q ++ = toupper(drive);
+		*q ++ = ':';
+		*q ++ = '\\';
 	}
 
 	// Now convert the rest to UTF-16
-	(void) MultiByteToWideChar(CP_UTF8, 0, p, -1, q, FILENAME_MAX - (q - native));
+    strcpy(q, p);
 
 	return 1;
 }
 
+// TODO: Un*x/Posix version
 static int 
-list_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
+list_folder_directory(wsk_ctx_t *ctx, const char * path, wsk_byte_t *buffer)
 {
-	// TODO: Un*x/Posix version
-	wchar_t filter[FILENAME_MAX];
+	char filter[FILENAME_MAX];
 	size_t plen;
-	wchar_t lastchar;
-	WIN32_FIND_DATAW f;
+	char lastchar;
+	WIN32_FIND_DATAA f;
 	HANDLE h;
 	unsigned n;
 
-	wcscpy_s( filter, FILENAME_MAX, path );
-	plen = wcsnlen(path, FILENAME_MAX);
-	lastchar = path[0] == L'\0' ? L'\0' : path[plen-1];
-	if ( path[0] != L'\0' && lastchar != L'\\' && lastchar != L'/' ) wcscat_s( filter, FILENAME_MAX, L"/" );
-	wcscat_s( filter, FILENAME_MAX, L"*" );
+	strcpy_s( filter, FILENAME_MAX, path );
+	plen = strnlen(path, FILENAME_MAX);
+	lastchar = path[0] == '\0' ? '\0' : path[plen-1];
+	if (path[0] != '\0' && lastchar != '\\' && lastchar != '/' ) strcat_s(filter, FILENAME_MAX, "/");
+	strcat_s(filter, FILENAME_MAX, "*");
 
-	h = FindFirstFileW( filter, &f );
+	h = FindFirstFileA( filter, &f );
 	if(h != INVALID_HANDLE_VALUE)
 	{
 		unsigned i;
@@ -133,12 +133,9 @@ list_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
             i = 2;
 		}
 		do {
-			char filename[FILENAME_MAX];
-			// Convert filename to UTF-8
-			WideCharToMultiByte( CP_UTF8, 0, f.cFileName, -1, filename, FILENAME_MAX, NULL, NULL );
 			// Now assemble an JSON line full of info
 			n = sprintf((char*)buffer, "{ \"name\": \"%s\", \"size\": \"%llu\", \"isDirectory\": %s }", 
-				filename, ((unsigned long long) ULONG_MAX + 1) * f.nFileSizeHigh + f.nFileSizeLow,
+				f.cFileName, ((unsigned long long) ULONG_MAX + 1) * f.nFileSizeHigh + f.nFileSizeLow,
 				(f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 ? "true" : "false" );
 			assert(n > 0);
 			// Send that line
@@ -146,7 +143,7 @@ list_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
                 FindClose(h);
                 return -1; } 
 			i ++;
-		} while( FindNextFileW(h, &f) );
+		} while( FindNextFileA(h, &f) );
 		FindClose(h);
         return 0; // success
 	}
@@ -167,7 +164,7 @@ list_folder_directory(wsk_ctx_t *ctx, const wchar_t * path, wsk_byte_t *buffer)
 int 
 list_directory(wsk_ctx_t *ctx, const char * parent_path)
 {
-	wchar_t pathbuf[FILENAME_MAX];
+	char pathbuf[FILENAME_MAX];
 	wsk_byte_t *buffer;
 	unsigned n;
     int retcode;
@@ -182,7 +179,7 @@ list_directory(wsk_ctx_t *ctx, const char * parent_path)
 	}
 	else
 	{
-		if ( ! normalized_path_to_windows( parent_path, pathbuf ) )
+		if (!normalized_path_to_native(parent_path, pathbuf))
 		{
 			n = sprintf((char*)buffer, "HTTP/1.0 400 Incorrect directory path \"%s\"\x0d\x0a"
 				"Server: libwebsockets\x0d\x0a"
